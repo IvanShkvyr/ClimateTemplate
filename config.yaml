@@ -1,0 +1,20 @@
+# Це коментар, який пояснює що знаходиться в наступному блоці
+folders_paths:
+  temp_folder: "temp/"
+  temp_folder_img: "temp/img"
+  temp_polder_fig: "temp/img_rec"
+  output_folder_img: "result/img/"
+  output_folder_png: "result/output_PNG/"
+
+path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
+
+path_to_tamplates: "data/raster_tamplates/background_tamplates"
+
+frame_to_raster: "data/raster_tamplates/extent/extent_operativa.tif"
+
+shapefiles_paths:
+  path_countrys: "data/shapefiles/country.shp"
+  path_central_countrys: "data/shapefiles/country_domena.shp"
+  path_sea: "data/shapefiles/sea.shp"
+
+font_path: "data\\font\\Roboto-Regular.ttf"
