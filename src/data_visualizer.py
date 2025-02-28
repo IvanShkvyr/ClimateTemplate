@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
 
 from src.data_loader import load_config
 
@@ -8,8 +9,31 @@ path_config = load_config("config.yaml")
 font_path = path_config["font_path"]
 
 
-def combine_maps_with_layout(background_path, maps_list, labels_list, output_path):
+def combine_maps_with_layout(
+                            background_path: Path,
+                            maps_list: list[Path],
+                            labels_list: list[str],
+                            output_path: Path,
+                            font_path: str = font_path
+                            ) -> None:
+    """
+    Combines map images with a background layout and adds labels.
 
+    This function places map images on a background layout, arranges them in a
+    grid, and adds labels below each map. It then saves the final composition to
+    a specified output file.
+
+    Args:
+        background_path (Path): The path to the background image.
+        maps_list (list[Path]): A list of paths to the map images to be added.
+        labels_list (list[str]): A list of labels corresponding to each map.
+        output_path (Path): The path where the final composition will be saved.
+        font_path (str, optional): The path to the font file used for labels.
+
+    Returns:
+        None: The function saves the final layout as a PNG file to the specified
+            output path.
+    """
     # Load the background layout
     background = Image.open(background_path).convert("RGBA")
 
@@ -25,7 +49,7 @@ def combine_maps_with_layout(background_path, maps_list, labels_list, output_pat
     draw = ImageDraw.Draw(background)
     font = ImageFont.truetype(font_path, size=62)
 
-    # Place maps on the layout
+    # Iterate through maps and place them on the background
     for idx, (map_path, label) in enumerate(zip(maps_list, labels_list)):
         # Calculate position
         row = idx // 5  # Create a new row every 5 maps
@@ -48,4 +72,4 @@ def combine_maps_with_layout(background_path, maps_list, labels_list, output_pat
 
     # Save the final image
     background.save(output_path, "PNG", optimize=True, dpi=(300, 300))
-    print("Layout saved to {}".format(output_path))
+    print(f"Layout saved to {output_path}")

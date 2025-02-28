@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import geopandas as gpd
 from matplotlib.colors import BoundaryNorm, ListedColormap, Normalize
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,112 +14,171 @@ from src.data_loader import read_and_clip_raster
 from src.data_visualizer import combine_maps_with_layout
 
 
+def convert_coordinate_systen_in_raster(
+                                        target_crs: CRS,
+                                        input_path: str,
+                                        output_path: str
+                                        ) -> None:
+    """
+    Converts the coordinate system of the input raster to the specified CRS 
+    and saves the reprojected raster to the given output path.
 
-def convert_coordinate_systen_in_raster(crs_mercator:CRS ,output_path: str, output_path_2: str) -> None:
-    """TODO"""
-    # Відкриваємо перетворений растр
-    with rasterio.open(output_path) as src:
-        print(f"Координатна система растра {src.crs}")
+    Args:
+        crs_mercator (CRS): The target coordinate reference system (CRS) to
+            which the raster should be converted. Typically, this would be the
+            Web Mercator projection (EPSG:3857).
+        input_path (str): The file path of the input raster that needs to be
+            reprojected.
+        output_path (str): The file path where the reprojected raster will
+            be saved.
 
-        if src.crs != crs_mercator:
-            # Обчислюємо нову трансформацію для CRS Web Mercator
+    Returns:
+        None: The function performs the reprojecting and saves the resulting
+            raster to the specified output path.
+    """
+
+    # Open the source raster to check its CRS and other properties
+    with rasterio.open(input_path) as src:
+
+        # Check if the CRS of the raster is different from the target CRS
+        if src.crs != target_crs:
+            # Calculate the transformation needed to convert the current CRS
+            # to target CRS
             transform, width, height = calculate_default_transform(
-                src.crs, crs_mercator, src.width, src.height, *src.bounds
+                src.crs, target_crs, src.width, src.height, *src.bounds
             )
-
-            # Отримуємо значення NoData з оригінального растра
             nodata_value = src.nodata
 
-            # Відкриваємо новий файл для запису перетворених даних
-            with rasterio.open(output_path_2, "w", driver="GTiff",
+            # Open a new raster file for saving the reprojected data
+            with rasterio.open(output_path, "w", driver="GTiff",
                             count=1, dtype=src.dtypes[0],
-                            crs=crs_mercator, transform=transform,
-                            width=width, height=height, nodata=nodata_value) as dst:
+                            crs=target_crs, transform=transform,
+                            width=width, height=height,
+                            nodata=nodata_value) as dst:
                 
-                # Перетворюємо дані з оригінальної системи координат в Web Mercator
+                # Reproject the data from the source CRS to the target CRS
                 reproject(
                     source=rasterio.band(src, 1),
                     destination=rasterio.band(dst, 1),
                     src_transform=src.transform,
                     src_crs=src.crs,
                     dst_transform=transform,
-                    dst_crs=crs_mercator,
+                    dst_crs=target_crs,
                     resampling=Resampling.nearest
                 )
 
-            print(f"Растер перетворений та збережений у {output_path_2}")
-            
-        else:
-            print("Растер вже у Web Mercator.")
+            # Print a success message once the raster is reprojected and saved
+            print(f"Raster reprojected and saved to {output_path}")
 
 
-def create_visualization_with_shapefiles(raster_file, final_path, colors_list, classes, shapefile_1, shapefile_2, shapefile_3):
 
-    # Завантажуємо растр
+def create_visualization_with_shapefiles(
+                                raster_file: str, 
+                                final_path: str, 
+                                colors_list: list[tuple], 
+                                classes: list[int], 
+                                countries_shapefile: gpd.GeoDataFrame, 
+                                central_countries_shapefile: gpd.GeoDataFrame, 
+                                sea_shapefile: gpd.GeoDataFrame
+                                ) -> None:
+    """
+    Creates a visualization by overlaying raster data with shapefiles and
+    saving the output as a PNG image.
+
+    Args:
+        raster_file (str): The path to the raster file to be visualized.
+        final_path (str): The path where the output PNG image will be saved.
+        colors_list (List[tuple]): A list of RGB colors to represent the unique
+            raster classes.
+        classes (List[int]): A list of unique classes in the raster data, used
+            to filter the color palette.
+        countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
+            boundaries of countries.
+        central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame
+            representing the boundaries of central countries.
+        sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
+            boundaries of seas.
+
+    Returns:
+        None: The function saves the resulting plot to the specified
+            `final_path` as a PNG image.
+    """
+    # Read the raster file
     with rasterio.open(raster_file) as src:
-        raster_data = src.read(1)  # читаємо перший канал
-        transform = src.transform  # географічна прив'язка
-        crs = src.crs  # система координат
-        nodata_value = src.nodata  # значення NoData, якщо є
+        raster_data = src.read(1)
+        transform = src.transform
+        nodata_value = src.nodata
 
-
-    # Отримуємо унікальні значення (класи) в растрі
+    # Get unique values (classes) from the raster data
     unique_classes = np.unique(raster_data)
 
-    # Фільтруємо палітру та boundaries тільки для унікальних класів
+    # Filter the boundaries and colors only for the unique classes
     filtered_boundaries = [b for b in classes if b in unique_classes]
-    filtered_colors = [colors_list[i] for i in range(len(classes)) if classes[i] in unique_classes]
+    filtered_colors = [colors_list[i]
+                for i in range(len(classes)) if classes[i] in unique_classes]
 
-
-
+    # If more than one unique class, create a proper colormap and normalization
     if len(filtered_boundaries) > 1:
-        # Створюємо палітру
-        cmap = ListedColormap([tuple(c / 255.0 for c in color) for color in filtered_colors])
-
-        # Створюємо нормалізацію за унікальними класами
+        cmap = ListedColormap(
+            [tuple(c / 255.0 for c in color)for color in filtered_colors]
+            )
         norm = BoundaryNorm(filtered_boundaries, cmap.N, extend='max')
 
     else:
-        # Якщо є лише один унікальний клас
-        cmap = ListedColormap([tuple(c / 255.0 for c in filtered_colors[0])])  # Один колір
+        # If there's only one unique class, use a single color
+        cmap = ListedColormap([tuple(c / 255.0 for c in filtered_colors[0])])
+        norm = Normalize(
+                        vmin=filtered_boundaries[0] - 0.5,
+                        vmax=filtered_boundaries[0] + 0.5
+                        )
 
-        # Створюємо просту нормалізацію для одного класу
-        norm = Normalize(vmin=filtered_boundaries[0] - 0.5, vmax=filtered_boundaries[0] + 0.5)
-
+    # Normalize the raster data values
     normalized_values = norm(raster_data)
 
-    # Створюємо фігуру для відображення
+    # Create a figure for the visualization
     fig, ax = plt.subplots(figsize=(21, 21), dpi=300)
 
-    # Налаштовуємо розмір виводу
+    # Set the extent of the plot based on the raster transform
     ax.set_xlim([transform[2], transform[2] + src.width * transform[0]])
     ax.set_ylim([transform[5] + src.height * transform[4], transform[5]])
 
-    # Маскуємо значення NoData та -999
+    # Mask NoData values and -999 values
     raster_data = np.ma.masked_where(raster_data == -999, raster_data)
-
     if nodata_value is not None:
         raster_data = np.ma.masked_equal(raster_data, nodata_value)
 
-    # Відображаємо растр з палітрою
+    # Show the raster data with the colormap and normalization
     show(normalized_values, ax=ax, cmap=cmap, transform=transform)
 
-    # Накладаємо шейпфайл 3
-    shapefile_3.plot(ax=ax, facecolor=(156/255, 156/255, 156/255), edgecolor='none', linewidth=3)
-
-    # Накладаємо шейпфайл 1
-    shapefile_1.plot(ax=ax, facecolor='none', edgecolor='black', linewidth=1.2)
-
-    # Накладаємо шейпфайл 2
-    shapefile_2.plot(ax=ax, facecolor='none', edgecolor='black', linewidth=3.2)
-
-
-    # Видаляємо осі
+    # Overlay the shapefiles on the plot
+    sea_shapefile.plot(
+                    ax=ax,
+                    facecolor=(156/255, 156/255, 156/255),
+                    edgecolor='none',
+                    linewidth=3
+                    )
+    countries_shapefile.plot(
+                            ax=ax,
+                            facecolor='none',
+                            edgecolor='black',
+                            linewidth=1.2
+                            )
+    central_countries_shapefile.plot(
+                                    ax=ax,
+                                    facecolor='none',
+                                    edgecolor='black',
+                                    linewidth=3.2
+                                    )
     ax.set_axis_off()
-
-    # Збереження фінального зображення
-    plt.savefig(final_path, format='png', dpi=300, bbox_inches='tight', pad_inches=-0.03)
-
+    # Save the final visualization as a PNG image
+    plt.savefig(
+                final_path,
+                format='png',
+                dpi=300,
+                bbox_inches='tight',
+                pad_inches=-0.04
+                )
+    # Close the figure to free memory
     plt.close(fig)
 
 
@@ -141,85 +201,178 @@ def ensure_directory_exists(directory_path: str) -> Path:
     return path
 
 
-def ensure_directories_exist(folders):
-    """Перевіряє існування директорій та створює їх, якщо потрібно."""
+def ensure_directories_exist(folders: list) -> dict:
+    """
+    Checks if the specified directories exist, and creates them if they do not.
+
+    Args:
+        folders (list): A list of folder paths that need to be checked and
+            created if necessary.
+
+    Returns:
+        dict: A dictionary where the key is the folder path and the value is
+            a boolean indicating whether the folder was created (True) or
+            already existed (False).
+    """
     return {folder: ensure_directory_exists(folder) for folder in folders}
 
 
-def process_rasters(list_of_rasters, mask_shape, tump_folder, tump_folder_img):
-    """Обробка растрів, вирізка та зміна системи координат."""
+def process_rasters(
+                    list_of_rasters: list[Path],
+                    mask_shape: dict,
+                    tump_folder: Path,
+                    tump_folder_img: Path,
+                    ) -> list[Path]:
+    """
+    Processes rasters by clipping them with a mask and converting their
+    coordinate system.
+
+    This function iterates through a list of raster files, clips each raster
+    using a provided mask shape, and converts the coordinate system to a
+    specified one. The processed rasters are saved in the specified temporary
+    folders.
+
+    Args:
+        list_of_rasters (List[Path]): A list of raster file paths to be
+            processed.
+        mask_shape (dict): The shape used for clipping the rasters.
+        tump_folder (Path): The temporary folder path where clipped rasters
+            will be saved.
+        tump_folder_img (Path): The temporary folder path where coordinate
+            system converted rasters will be saved.
+
+    Returns:
+        List[Path]: A list of file paths for the processed rasters (with the
+            converted coordinate system).
+    """
     list_of_img = []
     for raster in list_of_rasters:
+        # Define output paths for clipped raster and coordinate system converted
+        # raster
         output_path = tump_folder / raster.name
         output_path_2 = tump_folder_img / raster.name
+        # Clip raster based on the mask shape and save the result
         read_and_clip_raster(raster, mask_shape, output_path)
-        convert_coordinate_systen_in_raster(CRS_FOR_DATA, output_path, output_path_2)
+        # Convert the coordinate system of the raster and save the result
+        convert_coordinate_systen_in_raster(
+                                            CRS_FOR_DATA,
+                                            output_path,
+                                            output_path_2
+                                            )
+         # Append the processed raster to the list
         list_of_img.append(output_path_2)
+
     return list_of_img
 
 
-def process_raster_for_layout(raster_path,
-            list_for_background_layout,
-            countries_shapefile,
-            central_countries_shapefile,
-            sea_shapefile,
-            work_folder):
-                   
-    # Отримуємо тип з імені файлу
-        raster_parts_name = raster_path.stem.split("_")
-        raster_type = raster_parts_name[
-            0
-        ]  # Беремо частину імені до першого підкреслення
+def process_raster_for_layout(
+                            raster_path: Path,
+                            list_for_background_layout: dict[str, list],
+                            countries_shapefile: gpd.GeoDataFrame,
+                            central_countries_shapefile: gpd.GeoDataFrame,
+                            sea_shapefile: gpd.GeoDataFrame,
+                            work_folder: Path
+                            ) -> None:
+    """
+    Processes a raster file for visualization and classification, and organizes
+    the resulting image into background layout categories.
 
-        # Вибір палітри залежно від типу
-        if raster_type not in PALETTES:
-            raise ValueError(f"Палітра для типу {raster_type} не знайдена")
+    This function processes a given raster file by:
+    1. Extracting its type from the file name.
+    2. Reclassifying the raster if necessary.
+    3. Creating a visualization of the raster with specified shapefiles as
+        overlays.
+    4. Categorizing the processed image into a background layout group based
+        on its type.
 
-        # Завантажуємо палітру та межі для даного типу
-        palettes = PALETTES[raster_type]
-        boundaries = palettes["boundaries"]
-        colors = palettes["colors"]
-        classes = palettes["classes"]
+    Args:
+        raster_path (Path): The path to the raster file to be processed.
+        list_for_background_layout (Dict[str, list]): A dictionary that organizes processed raster images
+            into categories based on their type for layout purposes.
+        countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of countries.
+        central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of central countries.
+        sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of seas.
+        work_folder (Path): The folder where processed files will be saved.
 
-        if raster_type not in ["AWP", "FWI"]:
+    Returns:
+        None: The function does not return any value. It modifies `list_for_background_layout` in place.
+    """
+    # Extract the type of raster from the file name
+    raster_parts_name = raster_path.stem.split("_")
+    raster_type = raster_parts_name[0]
 
-            raster_path = reclassify_raster(raster_path, work_folder, boundaries)
+    # Choose palette based on raster type
+    if raster_type not in PALETTES:
+        raise ValueError(f"Palette for type {raster_type} not found")
 
-        img_path = work_folder / raster_path.name
+    # Load the palette and boundaries for the given raster type
+    palettes = PALETTES[raster_type]
+    boundaries = palettes["boundaries"]
+    colors = palettes["colors"]
+    classes = palettes["classes"]
 
-        print(img_path)
+    # If raster type is not "AWP" or "FWI", reclassify it
+    if raster_type not in ["AWP", "FWI"]:
+        raster_path = reclassify_raster(raster_path, work_folder, boundaries)
 
-        create_visualization_with_shapefiles(
-            raster_path,
-            img_path,
-            colors,
-            classes,
-            countries_shapefile,
-            central_countries_shapefile,
-            sea_shapefile,
-        )
+    img_path = Path(work_folder) / Path(raster_path).name
 
-        if "AW" in raster_type:
-            background_type = "_".join([raster_parts_name[0], raster_parts_name[1]])
-            background_type = background_type[:-2]
-        elif "FWI" in raster_type:
-            background_type = "FWI_GenZ"
-        else:
-            background_type = raster_parts_name[0]
+    # Create visualization with shapefiles as overlays
+    create_visualization_with_shapefiles(
+        raster_path,
+        img_path,
+        colors,
+        classes,
+        countries_shapefile,
+        central_countries_shapefile,
+        sea_shapefile,
+    )
 
-        if background_type not in list_for_background_layout:
-            list_for_background_layout[background_type] = []
+    # Determine the background type based on raster type
+    if "AW" in raster_type:
+        background_type = "_".join([raster_parts_name[0], raster_parts_name[1]])
+        background_type = background_type[:-2]
+    elif "FWI" in raster_type:
+        background_type = "FWI_GenZ"
+    else:
+        background_type = raster_parts_name[0]
 
-        print(f"background_type {background_type}")
+    if background_type not in list_for_background_layout:
+        list_for_background_layout[background_type] = []
 
-        list_for_background_layout[background_type].append(img_path)
+    # Append the image path to the appropriate background type category
+    list_for_background_layout[background_type].append(img_path)
 
 
-def process_backgrounds(list_of_background, list_for_background_layout, work_folder):
-    """Обробка фону та комбінування карт."""
+def process_backgrounds(
+        list_of_background: list[Path],
+        list_for_background_layout: dict[str, list[Path]],
+        work_folder: Path,
+        ) -> None:
+    """
+    Processes backgrounds and combines maps into a layout.
+
+    This function processes a list of background images, extracts the date from 
+    the file names, and combines the background with its corresponding maps 
+    (from `list_for_background_layout`) into a composite image for each
+    background type.
+    
+    Args:
+        list_of_background (list[Path]): A list of paths to background images.
+        list_for_background_layout (dict[str, list[Path]]): A dictionary where
+            keys are background types, and values are lists of paths to image
+            files that should be combined with the background.
+        work_folder (Path): The folder where the combined images will be saved.
+
+    Returns:
+        None: The function does not return anything. It generates and saves
+            composite images.
+    """
     for background in list_of_background:
         date_labels = []
         background_type = background.stem
+
+        # Adjust background type if it contains "AW"
         if "AW" in background_type:
             background_type = background_type[3:-2]
         else:
@@ -228,38 +381,64 @@ def process_backgrounds(list_of_background, list_for_background_layout, work_fol
         try:
             img_list = list_for_background_layout[background_type]
         except KeyError:
-            print(f"Немає {background_type}")
+            print(f"Background type {background_type} not found in layout.")
             continue
 
+        # Extract date labels from image filenames
         for img in img_list:
             date = img.stem.split("_")[-1]
             date_labels.append(date)
 
+        # Define the output path for the composite image
         out_comp_file = work_folder / f"{background_type}.png"
-        combine_maps_with_layout(background, img_list, date_labels, out_comp_file)
+        combine_maps_with_layout(
+                                background,
+                                img_list,
+                                date_labels,
+                                out_comp_file
+                                )
 
 
-def reclassify_raster(raster_path, output_raster_path, boundaries):
+def reclassify_raster(
+                    raster_path: Path, 
+                    output_raster_path: Path, 
+                    boundaries: list[float]
+                    ) -> Path:
+    """
+    Reclassifies a raster based on specified boundaries and saves the output.
 
-    # Завантаження растру
+    This function reads an input raster, reclassifies its pixel values into 
+    new classes based on the provided boundaries, and writes the reclassified
+    raster to the specified output path. The new raster will have integer class
+    values.
+
+    Args:
+        raster_path (Path): The path to the input raster file.
+        output_raster_path (Path): The directory where the output raster file
+            will be saved.
+        boundaries (List[float]): A list of boundary values to define the
+            reclassification bins.
+
+    Returns:
+        Path: The path to the saved reclassified raster file.
+    """
+    # Load the raster file
     with rasterio.open(raster_path) as src:
-        raster_data = src.read(1)  # Читаємо перший канал
+        raster_data = src.read(1)
         profile = src.profile
+        # Default to -999 if NoData is not defined
         nodata_value = src.nodata if src.nodata is not None else -999.0
     
-    classes = np.digitize(raster_data, bins=boundaries, right=True) - 1  # Перекласифікація
+    # Reclassify the raster data based on the provided boundaries
+    classes = np.digitize(raster_data, bins=boundaries, right=True) - 1
     
-    # # Збереження NoData значень
-    # classes[classes == -999] = nodata_value  # Замінюємо -999 на офіційне NoData  # Повертаємо NoData у вихідний файл
     
+    final_path = Path(output_raster_path) / Path(raster_path).name
 
-    final_path = output_raster_path / raster_path.name
+    # Update the profile with new data type and NoData value
+    profile.update(dtype=rasterio.int16, count=1, nodata=nodata_value)
 
-    # Запис нового растру
-    profile.update(dtype=rasterio.int16, count=1, nodata=nodata_value)  # Використовуємо int16 для NoData
-
-
-
+    # Write the reclassified raster to the output path
     with rasterio.open(final_path, 'w', **profile) as dst:
         dst.write(classes.astype(rasterio.int16), 1)
 
