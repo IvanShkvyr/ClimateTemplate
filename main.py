@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from src.data_loader import (
-    load_config, load_shp, grab_files, load_data_from_mask_raster
+    create_data_folder_path, load_config, load_shp, grab_files,
+    load_data_from_mask_raster
     )
 from src.data_processor import (
     ensure_directories_exist, process_rasters, process_backgrounds,
@@ -30,6 +31,9 @@ path_sea = path_config["shapefiles_paths"]["path_sea"]
 def main():
     start_time = datetime.now()
 
+    # Creating a path to the data folder
+    path_to_data = create_data_folder_path(path_to_sours)
+
     # Ensure necessary directories exist
     folders = [
         temp_folder,
@@ -41,7 +45,7 @@ def main():
     directories = ensure_directories_exist(folders)
 
     # Create file lists
-    list_of_rasters = grab_files(path_to_sours)
+    list_of_rasters = grab_files(path_to_data)
     list_of_background = grab_files(path_to_tamplates, extensions=(".png",))
 
     # Create mask shape

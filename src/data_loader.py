@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 import geopandas as gpd
@@ -8,6 +9,31 @@ from rasterio.mask import mask
 import yaml
 
 from src.constants import CRS_FOR_DATA, PARAMETERS
+
+
+def create_data_folder_path(main_path: str) -> str:
+    """
+    Create a path to a folder based on the current date.
+
+    This function takes the main path as input and appends the current date
+    in the format 'YYYY-MM-DD' to it, creating a final path for the data folder.
+    
+    Args:
+        main_path (str): The base directory path where the data folder will be
+            created.
+
+    Returns:
+        str: The complete path to the data folder with the current date appended
+    """
+    # Get today's date and format the date as YYYY-MM-DD
+    today = date.today()
+    year = today.strftime("%Y")
+    day = today.strftime("%Y-%m-%d")
+
+    # Combine the main path with the current date
+    final_path = main_path + "/" + year + "/" + day
+
+    return final_path
 
 
 def grab_files(
