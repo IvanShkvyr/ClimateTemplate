@@ -1,22 +1,36 @@
-from datetime import datetime
+from datetime import date, datetime
+import os
+
+from dotenv import load_dotenv
 
 from src.data_loader import (
     create_data_folder_path, load_config, load_shp, grab_files,
-    load_data_from_mask_raster
+    load_data_from_mask_raster, remove_directory
     )
 from src.data_processor import (
     ensure_directories_exist, process_rasters, process_backgrounds,
     process_raster_for_layout
 )
+from src.sftp_connection import (
+    connect_to_sftp, disconnect_from_sftp, upload_directory
+    )
 
+
+load_dotenv()
+
+sftp_host = os.getenv("HOST")
+sftp_username = os.getenv("USERNAME")
+sftp_password = os.getenv("PASSWORD")
+sftp_port = os.getenv("PORT")
 
 path_config = load_config("config.yaml")
 
 temp_folder = path_config["folders_paths"]["temp_folder"]
+temp_cropped_images = path_config["folders_paths"]["temp_folder_crop"]
+temp_folder_trans = path_config["folders_paths"]["temp_folder_trans"]
+temp_polder_rec = path_config["folders_paths"]["temp_polder_rec"]
 temp_folder_img = path_config["folders_paths"]["temp_folder_img"]
-temp_polder_fig = path_config["folders_paths"]["temp_polder_fig"]
-output_folder_img = path_config["folders_paths"]["output_folder_img"]
-output_folder_png = path_config["folders_paths"]["output_folder_png"]
+temp_folder_png = path_config["folders_paths"]["temp_folder_png"]
 
 path_to_sours = path_config["path_to_sours"]
 
@@ -27,20 +41,25 @@ path_countrys = path_config["shapefiles_paths"]["path_countrys"]
 path_central_countrys = path_config["shapefiles_paths"]["path_central_countrys"]
 path_sea = path_config["shapefiles_paths"]["path_sea"]
 
+remote_dir = path_config["remote_dir"]
+
 
 def main():
     start_time = datetime.now()
 
+    # Get today's date and format the date as YYYY-MM-DD
+    today = date.today()
+
     # Creating a path to the data folder
-    path_to_data = create_data_folder_path(path_to_sours)
+    path_to_data = create_data_folder_path(path_to_sours, today)
 
     # Ensure necessary directories exist
     folders = [
-        temp_folder,
+        temp_cropped_images,
+        temp_folder_trans,
+        temp_polder_rec,
         temp_folder_img,
-        temp_polder_fig,
-        output_folder_img,
-        output_folder_png
+        temp_folder_png
         ]
     directories = ensure_directories_exist(folders)
 
@@ -55,8 +74,8 @@ def main():
     list_of_img = process_rasters(
         list_of_rasters,
         mask_shape,
-        directories[temp_folder],
-        directories[temp_folder_img]
+        directories[temp_cropped_images],
+        directories[temp_folder_trans]
         )
 
     # Load shapefiles
@@ -73,20 +92,35 @@ def main():
             countries_shapefile,
             central_countries_shapefile,
             sea_shapefile,
-            output_folder_img
+            temp_folder_img
             )
 
     # Process backgrounds
     process_backgrounds(
         list_of_background,
         list_for_background_layout,
-        directories[output_folder_png],
+        directories[temp_folder_png],
         )
+
+    # # Establishing a connection to the SFTP server
+    # sftp = connect_to_sftp(sftp_host, sftp_username, sftp_password, int(sftp_port))
+
+    # # NOTE: Use this path for testing (static folder name)
+    # remote_date_path = os.path.join(remote_dir, "test")
+
+    # # NOTE: Use the following line for production (dynamic folder name based on the current date)
+    # # remote_date_path = os.path.join(remote_dir, today.strftime("%Y-%m-%d"))
+
+    # # Uploading a local folder to SFTP
+    # upload_directory(sftp, temp_folder_png, remote_date_path)
+
+    # disconnect_from_sftp(sftp)
+
+    remove_directory(temp_folder)
 
     # Calculate execution time
     end_time = datetime.now()
     print(f"Execution time: {end_time - start_time}")
-
 
 if __name__ == "__main__":
 

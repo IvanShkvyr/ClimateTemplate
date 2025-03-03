@@ -1,5 +1,6 @@
 from datetime import date
 from pathlib import Path
+import shutil
 
 import geopandas as gpd
 from pyproj import CRS
@@ -11,7 +12,7 @@ import yaml
 from src.constants import CRS_FOR_DATA, PARAMETERS
 
 
-def create_data_folder_path(main_path: str) -> str:
+def create_data_folder_path(main_path: str, today: date) -> str:
     """
     Create a path to a folder based on the current date.
 
@@ -21,12 +22,12 @@ def create_data_folder_path(main_path: str) -> str:
     Args:
         main_path (str): The base directory path where the data folder will be
             created.
+        today (date): The specific date used to generate the folder path, in
+            'YYYY-MM-DD' format.
 
     Returns:
         str: The complete path to the data folder with the current date appended
     """
-    # Get today's date and format the date as YYYY-MM-DD
-    today = date.today()
     year = today.strftime("%Y")
     day = today.strftime("%Y-%m-%d")
 
@@ -200,3 +201,20 @@ def read_and_clip_raster(
         # Write the clipped raster data to the output file
         with rasterio.open(output_path, "w", **output_meta) as dst:
             dst.write(large_raster_data)
+
+
+def remove_directory(temp_path: str) -> None:
+    """
+    Removes the specified directory.
+
+    Parameters:
+        temp_path (str): Path to the directory to be removed.
+
+    Returns:
+        None
+    """
+    temp_folder = Path(temp_path)
+
+    # Check if the directory exists and is indeed a directory
+    if temp_folder.exists() and temp_folder.is_dir():
+        shutil.rmtree(temp_folder)
