@@ -11,17 +11,21 @@ from src.data_processor import (
     ensure_directories_exist, process_rasters, process_backgrounds,
     process_raster_for_layout
 )
-from src.sftp_connection import (
+from connection import (
     connect_to_sftp, disconnect_from_sftp, upload_directory
     )
 
 
 load_dotenv()
 
-sftp_host = os.getenv("HOST")
-sftp_username = os.getenv("USERNAME")
-sftp_password = os.getenv("PASSWORD")
-sftp_port = os.getenv("PORT")
+sftp_host = os.getenv("SFTP_HOST")
+sftp_username = os.getenv("SFTP_USERNAME")
+sftp_password = os.getenv("SFTP_PASSWORD")
+sftp_port = os.getenv("SFTP_PORT")
+
+ftp_host = os.getenv("FTP_HOST")
+ftp_username = os.getenv("FTP_USERNAME")
+ftp_password = os.getenv("FTP_PASSWORD")
 
 path_config = load_config("config.yaml")
 
@@ -105,8 +109,8 @@ def main():
     # # Establishing a connection to the SFTP server
     # sftp = connect_to_sftp(sftp_host, sftp_username, sftp_password, int(sftp_port))
 
-    # # NOTE: Use this path for testing (static folder name)
-    # remote_date_path = os.path.join(remote_dir, "test")
+    # NOTE: Use this path for testing (static folder name)
+    remote_date_path = os.path.join(remote_dir, "test")
 
     # # NOTE: Use the following line for production (dynamic folder name based on the current date)
     # # remote_date_path = os.path.join(remote_dir, today.strftime("%Y-%m-%d"))
