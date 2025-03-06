@@ -203,7 +203,7 @@ def read_and_clip_raster(
             dst.write(large_raster_data)
 
 
-def remove_directory(temp_path: str) -> None:
+def remove_local_directory(temp_path: str) -> None:
     """
     Removes the specified directory.
 

@@ -11,7 +11,7 @@ folders_paths:
   # Path to the folder where images with palette colors and country boundaries will be saved
   temp_folder_img: "temp/processed_images/"
   # Path to the folder where final PNG images will be saved
-  temp_folder_png: "result/final_PNG/"
+  temp_folder_png: "temp/final_PNG/"
 
 # Path to the folder containing model predictions (base images)
 path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
@@ -36,4 +36,7 @@ shapefiles_paths:
 font_path: "data\\font\\Roboto-Regular.ttf"
 
 # This is the directory on the SFTP server where completed images will be uploaded for the website.
-remote_dir: "data/"
+remote_sftp_dir: "data/"
+
+# This is the directory on the FTP server where completed images will be uploaded for the website.
+remote_ftp_dir: "/firerisk/maps/"

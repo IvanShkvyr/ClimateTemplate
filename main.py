@@ -1,3 +1,7 @@
+import sys
+sys.path.append('D:/CzechGlobe/Task/ClimateTemplate')
+
+
 from datetime import date, datetime
 import os
 
@@ -5,14 +9,16 @@ from dotenv import load_dotenv
 
 from src.data_loader import (
     create_data_folder_path, load_config, load_shp, grab_files,
-    load_data_from_mask_raster, remove_directory
+    load_data_from_mask_raster, remove_local_directory
     )
 from src.data_processor import (
     ensure_directories_exist, process_rasters, process_backgrounds,
     process_raster_for_layout
 )
-from connection import (
-    connect_to_sftp, disconnect_from_sftp, upload_directory
+from src.connection import (
+    connect_to_sftp, disconnect_from_sftp, remove_old_sftp_folders, 
+    upload_directory_in_sftp, connect_to_ftp, upload_files_to_ftp,
+    disconnect_from_ftp
     )
 
 
@@ -45,7 +51,10 @@ path_countrys = path_config["shapefiles_paths"]["path_countrys"]
 path_central_countrys = path_config["shapefiles_paths"]["path_central_countrys"]
 path_sea = path_config["shapefiles_paths"]["path_sea"]
 
-remote_dir = path_config["remote_dir"]
+remote_sftp_dir = path_config["remote_sftp_dir"]
+remote_ftp_dir = path_config["remote_ftp_dir"]
+
+
 
 
 def main():
@@ -106,21 +115,34 @@ def main():
         directories[temp_folder_png],
         )
 
-    # # Establishing a connection to the SFTP server
-    # sftp = connect_to_sftp(sftp_host, sftp_username, sftp_password, int(sftp_port))
+    # Establishing a connection to the SFTP server
+    sftp = connect_to_sftp(sftp_host, sftp_username, sftp_password, int(sftp_port))
 
     # NOTE: Use this path for testing (static folder name)
-    remote_date_path = os.path.join(remote_dir, "test")
+    remote_date_path = os.path.join(remote_sftp_dir, "test2")
 
-    # # NOTE: Use the following line for production (dynamic folder name based on the current date)
-    # # remote_date_path = os.path.join(remote_dir, today.strftime("%Y-%m-%d"))
+    # NOTE: Use the following line for production (dynamic folder name based on the current date)
+    # remote_date_path = os.path.join(remote_sftp_dir, today.strftime("%Y-%m-%d"))
 
-    # # Uploading a local folder to SFTP
-    # upload_directory(sftp, temp_folder_png, remote_date_path)
+    # Uploading a local folder to SFTP
+    upload_directory_in_sftp(sftp, temp_folder_png, remote_date_path)
 
-    # disconnect_from_sftp(sftp)
+    # NOTE:Deleting the oldest directory
+    # remove_old_sftp_folders(sftp, remote_sftp_dir, 7)
 
-    remove_directory(temp_folder)
+    disconnect_from_sftp(sftp)
+
+
+    # Establishing a connection to the FTP server
+    ftp = connect_to_ftp(ftp_host, ftp_username, ftp_password)
+
+    # Uploading datas from a local folder to FTP
+    upload_files_to_ftp(ftp, temp_folder_png, remote_ftp_dir)
+
+    disconnect_from_ftp(ftp)
+
+    # Remove temporary directory after processing is complete
+    remove_local_directory(temp_folder)
 
     # Calculate execution time
     end_time = datetime.now()

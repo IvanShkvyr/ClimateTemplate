@@ -1,6 +1,8 @@
+from datetime import datetime
 from ftplib import FTP, error_perm, all_errors
 from paramiko import SSHException
 import os
+import shutil
 
 import pysftp
 
@@ -74,7 +76,7 @@ def connect_to_sftp(
         return None
 
 
-def upload_directory(
+def upload_directory_in_sftp(
                     sftp: pysftp.Connection,
                     source: str,
                     destination: str
@@ -148,6 +150,112 @@ def upload_directory(
                 print(f"Failed to upload file {local_file}: {e}")
 
 
+def remove_old_sftp_folders(sftp_client: pysftp.Connection, 
+                            remote_root: str, 
+                            days_threshold: int = 7
+                            ) -> None:
+    """
+    Removes directories in the specified remote root on the SFTP server that are
+    older than a specified number of days.
+
+    This function checks the directories in the given remote root path and
+    deletes those whose names are formatted as dates and exceed the specified
+    age threshold. The directories are identified by their names, which are
+    expected to be in the 'YYYY-MM-DD' format. If the directory is older than 
+    the specified threshold (in days), it will be removed.
+
+    Args:
+        sftp_client (pysftp.Connection): The SFTP connection object used to
+            interact with the server.
+        remote_root (str): The path to the remote directory on the SFTP server
+            where directories will be checked.
+        days_threshold (int, optional): The number of days a directory must be
+            older than to be removed. Default is 7.
+
+    Returns:
+        None: This function does not return any value.
+    """
+    current_time = datetime.now()
+
+    try:
+        # Fetching the list of directories in the remote root
+        dir_entries = sftp_client.listdir_attr(remote_root)
+        
+        for entry in dir_entries:
+            try:
+                # Attempting to parse directory name as a date
+                dir_date = datetime.datetime.strptime(
+                                                    entry.filename, "%Y-%m-%d"
+                                                    )
+                # Checking if the directory is older than the threshold
+                if (current_time - dir_date).days > days_threshold:
+                    _remove_directory_in_sftp(
+                                            sftp_client,
+                                            remote_root,
+                                            entry.filename
+                                            )
+            except ValueError:
+                # Skipping directories whose names are not valid date formats
+                continue
+    except Exception as e:
+        print(f"Error while working with the directory {remote_root}: {e}")
+
+
+def _remove_directory_in_sftp(
+    sftp_client: pysftp.Connection, 
+    remote_root: str, 
+    dir_name: str
+) -> None:
+    """
+    Recursively deletes a directory and its contents from the remote SFTP server
+
+    This function takes a remote directory specified by `remote_root` and
+    `dir_name`, checks if it exists, and then recursively deletes all files and
+    subdirectories within it before deleting the directory itself.
+
+    Args:
+        sftp_client (pysftp.Connection): The active SFTP connection object used
+            to interact with the server.
+        remote_root (str): The root directory on the remote SFTP server where
+            the target directory is located.
+        dir_name (str): The name of the directory to be deleted.
+
+    Returns:
+        None: This function does not return any value.
+    """
+    # Construct the full remote path
+    remote_path = f"{remote_root}/{dir_name}".replace('\\', '/')
+    
+    try:
+        # Check if the directory exists
+        if not sftp_client.exists(remote_path):
+            print(f"Directory {remote_path} does not exist.")
+            return
+            
+        # Recursively delete files and subdirectories
+        for entry in sftp_client.listdir_attr(remote_path):
+            entry_name = entry.filename
+            full_remote_path = f"{remote_path}/{entry_name}".replace('\\', '/')
+            
+            if sftp_client.isdir(full_remote_path):
+                # Recursively delete subdirectories
+                _remove_directory_in_sftp(
+                    sftp_client, 
+                    remote_path,
+                    entry_name
+                )
+            else:
+                # Delete file
+                sftp_client.remove(full_remote_path)
+                print(f"Deleted file: {full_remote_path}")
+        # Remove the empty directory
+        sftp_client.rmdir(remote_path)
+        print(f"Deleted directory: {remote_path}")
+    
+    except Exception as e:
+        print(f"Error occurred while deleting directory {remote_path}: {e}")
+
+
 def disconnect_from_sftp(sftp: pysftp.Connection) -> None:
     """
     Disconnects from the SFTP server and closes the connection.
@@ -202,7 +310,7 @@ def connect_to_ftp(host: str, username: str, password: str) -> FTP:
 
 
 def upload_files_to_ftp(
-        ftp: FTP, 
+        ftp_connection: FTP, 
         local_folder: str, 
         remote_folder: str
     ) -> list[str]:
@@ -225,13 +333,13 @@ def upload_files_to_ftp(
 
     try:
         # Attempt to change to the target directory
-        ftp.cwd(remote_folder)
+        ftp_connection.cwd(remote_folder)
         print(f"Changed directory to {remote_folder}")
     except error_perm:
         try:
             # Create the directory if it does not exist
-            ftp.mkd(remote_folder)
-            ftp.cwd(remote_folder)
+            ftp_connection.mkd(remote_folder)
+            ftp_connection.cwd(remote_folder)
             print(f"Created and changed to directory {remote_folder}")
         except Exception as e:
             print(f"Failed to create directory {remote_folder}: {e}")
@@ -244,7 +352,7 @@ def upload_files_to_ftp(
         if os.path.isfile(local_path):
             try:
                 with open(local_path, 'rb') as file:
-                    ftp.storbinary(f'STOR {filename}', file)
+                    ftp_connection.storbinary(f'STOR {filename}', file)
                 uploaded_files.append(filename)
                 print(f"Uploaded {filename} → {remote_folder}")
             except Exception as e:
