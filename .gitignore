@@ -25,7 +25,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
 data/2024-06-20
+data/raster_tamplates/background_tamplates
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

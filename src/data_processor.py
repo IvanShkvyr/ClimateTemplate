@@ -1,7 +1,9 @@
 from pathlib import Path
 
 import geopandas as gpd
-from matplotlib.colors import BoundaryNorm, ListedColormap, Normalize
+from matplotlib.colors import (
+    BoundaryNorm, ListedColormap, Normalize, LinearSegmentedColormap
+    )
 import matplotlib.pyplot as plt
 import numpy as np
 from pyproj import CRS
@@ -9,7 +11,7 @@ import rasterio
 from rasterio.plot import show
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 
-from src.constants import CRS_FOR_DATA, PALETTES
+from src.constants import CRS_FOR_DATA
 from src.data_loader import read_and_clip_raster
 from src.data_visualizer import combine_maps_with_layout
 
@@ -71,33 +73,37 @@ def convert_coordinate_systen_in_raster(
             print(f"Raster reprojected and saved to {output_path}")
 
 
-
-def create_visualization_with_shapefiles(
+def create_visualization_countinious_with_shapefiles(
                                 raster_file: str, 
                                 final_path: str, 
                                 colors_list: list[tuple], 
-                                classes: list[int], 
+                                boundaries: list[float], 
                                 countries_shapefile: gpd.GeoDataFrame, 
                                 central_countries_shapefile: gpd.GeoDataFrame, 
-                                sea_shapefile: gpd.GeoDataFrame
+                                sea_shapefile: gpd.GeoDataFrame,
+                                continuous: bool = True
                                 ) -> None:
     """
     Creates a visualization by overlaying raster data with shapefiles and
-    saving the output as a PNG image.
+    saving the output as a PNG image. Works with both classified and continuous
+    data.
 
     Args:
         raster_file (str): The path to the raster file to be visualized.
         final_path (str): The path where the output PNG image will be saved.
-        colors_list (List[tuple]): A list of RGB colors to represent the unique
-            raster classes.
-        classes (List[int]): A list of unique classes in the raster data, used
-            to filter the color palette.
+        colors_list (List[tuple]): A list of RGB colors to represent the data
+            values at boundaries.
+        boundaries (List[float]): A list of boundaries for color mapping. For
+            continuous data, these define where each color in colors_list should
+            be placed.
         countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
             boundaries of countries.
         central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame
             representing the boundaries of central countries.
         sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
             boundaries of seas.
+        continuous (bool, optional): If True, uses a continuous color gradient
+            between boundaries. If False, uses discrete classes.
 
     Returns:
         None: The function saves the resulting plot to the specified
@@ -109,31 +115,41 @@ def create_visualization_with_shapefiles(
         transform = src.transform
         nodata_value = src.nodata
 
-    # Get unique values (classes) from the raster data
-    unique_classes = np.unique(raster_data)
-
-    # Filter the boundaries and colors only for the unique classes
-    filtered_boundaries = [b for b in classes if b in unique_classes]
-    filtered_colors = [colors_list[i]
-                for i in range(len(classes)) if classes[i] in unique_classes]
-
-    # If more than one unique class, create a proper colormap and normalization
-    if len(filtered_boundaries) > 1:
-        cmap = ListedColormap(
-            [tuple(c / 255.0 for c in color)for color in filtered_colors]
-            )
-        norm = BoundaryNorm(filtered_boundaries, cmap.N, extend='max')
-
+    # Create a mask for NoData values and -999 values
+    mask = (raster_data == -999)
+    if nodata_value is not None:
+        mask = np.logical_or(mask, raster_data == nodata_value)
+    
+    # Apply the mask
+    masked_data = np.ma.masked_where(mask, raster_data)
+    
+    # Normalize colors to 0-1 range for matplotlib
+    normalized_colors = [tuple(c / 255.0 for c in color) for color in colors_list]
+    
+    if continuous:
+        # Create a mask for NoData values 
+        no_data_mask = np.logical_or(raster_data == -999, raster_data == -1)
+        
+        # Calculate color positions based on boundaries 
+        min_val = boundaries[1]  # First valid boundary after NoData
+        max_val = boundaries[-1]
+        positions = [(boundary - min_val) / (max_val - min_val) for boundary in boundaries[1:]]
+        positions = [0] + positions  # Add 0 for the first color
+        
+        # Create a color map
+        cmap = LinearSegmentedColormap.from_list("custom_cmap", 
+                            list(zip(positions, normalized_colors[1:])))
+        
+        # Create a color map
+        norm = Normalize(vmin=min_val, vmax=max_val)
+        
+        # Apply mask for NoData values
+        masked_data = np.ma.masked_where(no_data_mask, raster_data)
+    
     else:
-        # If there's only one unique class, use a single color
-        cmap = ListedColormap([tuple(c / 255.0 for c in filtered_colors[0])])
-        norm = Normalize(
-                        vmin=filtered_boundaries[0] - 0.5,
-                        vmax=filtered_boundaries[0] + 0.5
-                        )
-
-    # Normalize the raster data values
-    normalized_values = norm(raster_data)
+        # For discrete classes, use the original approach
+        cmap = ListedColormap(normalized_colors)
+        norm = BoundaryNorm(boundaries, cmap.N, extend='max')
 
     # Create a figure for the visualization
     fig, ax = plt.subplots(figsize=(21, 21), dpi=300)
@@ -142,13 +158,8 @@ def create_visualization_with_shapefiles(
     ax.set_xlim([transform[2], transform[2] + src.width * transform[0]])
     ax.set_ylim([transform[5] + src.height * transform[4], transform[5]])
 
-    # Mask NoData values and -999 values
-    raster_data = np.ma.masked_where(raster_data == -999, raster_data)
-    if nodata_value is not None:
-        raster_data = np.ma.masked_equal(raster_data, nodata_value)
-
     # Show the raster data with the colormap and normalization
-    show(normalized_values, ax=ax, cmap=cmap, transform=transform)
+    show(masked_data, ax=ax, cmap=cmap, norm=norm, transform=transform)
 
     # Overlay the shapefiles on the plot
     sea_shapefile.plot(
@@ -169,7 +180,9 @@ def create_visualization_with_shapefiles(
                                     edgecolor='black',
                                     linewidth=3.2
                                     )
+
     ax.set_axis_off()
+    
     # Save the final visualization as a PNG image
     plt.savefig(
                 final_path,
@@ -271,7 +284,8 @@ def process_raster_for_layout(
                             countries_shapefile: gpd.GeoDataFrame,
                             central_countries_shapefile: gpd.GeoDataFrame,
                             sea_shapefile: gpd.GeoDataFrame,
-                            work_folder: Path
+                            work_folder: Path,
+                            palletes: dict
                             ) -> None:
     """
     Processes a raster file for visualization and classification, and organizes
@@ -287,29 +301,35 @@ def process_raster_for_layout(
 
     Args:
         raster_path (Path): The path to the raster file to be processed.
-        list_for_background_layout (Dict[str, list]): A dictionary that organizes processed raster images
-            into categories based on their type for layout purposes.
-        countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of countries.
-        central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of central countries.
-        sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the boundaries of seas.
+        list_for_background_layout (Dict[str, list]): A dictionary that
+            organizes processed raster images into categories based on their
+            type for layout purposes.
+        countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the
+            boundaries of countries.
+        central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame
+            containing the boundaries of central countries.
+        sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame containing the
+            boundaries of seas.
         work_folder (Path): The folder where processed files will be saved.
 
     Returns:
-        None: The function does not return any value. It modifies `list_for_background_layout` in place.
+        None: The function does not return any value. It modifies
+            `list_for_background_layout` in place.
     """
     # Extract the type of raster from the file name
     raster_parts_name = raster_path.stem.split("_")
     raster_type = raster_parts_name[0]
 
     # Choose palette based on raster type
-    if raster_type not in PALETTES:
+    if raster_type not in palletes:
         raise ValueError(f"Palette for type {raster_type} not found")
 
     # Load the palette and boundaries for the given raster type
-    palettes = PALETTES[raster_type]
-    boundaries = palettes["boundaries"]
-    colors = palettes["colors"]
-    classes = palettes["classes"]
+    palette = palletes[raster_type]
+    boundaries = palette["boundaries"]
+    colors = palette["colors"]
+    classes = palette["classes"]
+    continuous = palette["continuous_coloring"]
 
     # If raster type is not "AWP" or "FWI", reclassify it
     if raster_type not in ["AWP", "FWI"]:
@@ -318,15 +338,15 @@ def process_raster_for_layout(
     img_path = Path(work_folder) / Path(raster_path).name
 
     # Create visualization with shapefiles as overlays
-    create_visualization_with_shapefiles(
-        raster_path,
-        img_path,
-        colors,
-        classes,
-        countries_shapefile,
-        central_countries_shapefile,
-        sea_shapefile,
-    )
+    create_visualization_countinious_with_shapefiles(
+                                raster_path, 
+                                img_path, 
+                                colors, 
+                                classes, 
+                                countries_shapefile,
+                                central_countries_shapefile,
+                                sea_shapefile,
+                                continuous)
 
     # Determine the background type based on raster type
     if "AW" in raster_type:

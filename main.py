@@ -1,3 +1,4 @@
+from pathlib import Path
 import sys
 sys.path.append('D:/CzechGlobe/Task/ClimateTemplate')
 
@@ -13,13 +14,14 @@ from src.data_loader import (
     )
 from src.data_processor import (
     ensure_directories_exist, process_rasters, process_backgrounds,
-    process_raster_for_layout
+    process_raster_for_layout, ensure_directory_exists
 )
 from src.connection import (
     connect_to_sftp, disconnect_from_sftp, remove_old_sftp_folders, 
     upload_directory_in_sftp, connect_to_ftp, upload_files_to_ftp,
     disconnect_from_ftp
     )
+from src.constants import PALETTES_V1, PALETTES_V2
 
 
 load_dotenv()
@@ -39,7 +41,8 @@ temp_folder = path_config["folders_paths"]["temp_folder"]
 temp_cropped_images = path_config["folders_paths"]["temp_folder_crop"]
 temp_folder_trans = path_config["folders_paths"]["temp_folder_trans"]
 temp_polder_rec = path_config["folders_paths"]["temp_polder_rec"]
-temp_folder_img = path_config["folders_paths"]["temp_folder_img"]
+temp_folder_img_v1 = path_config["folders_paths"]["temp_folder_img_v1"]
+temp_folder_img_v2 = path_config["folders_paths"]["temp_folder_img_v2"]
 temp_folder_png = path_config["folders_paths"]["temp_folder_png"]
 
 path_to_sours = path_config["path_to_sours"]
@@ -55,8 +58,6 @@ remote_sftp_dir = path_config["remote_sftp_dir"]
 remote_ftp_dir = path_config["remote_ftp_dir"]
 
 
-
-
 def main():
     start_time = datetime.now()
 
@@ -66,12 +67,16 @@ def main():
     # Creating a path to the data folder
     path_to_data = create_data_folder_path(path_to_sours, today)
 
+    # # # NOTE TEST
+    # path_to_data = path_to_sours
+
     # Ensure necessary directories exist
     folders = [
         temp_cropped_images,
         temp_folder_trans,
         temp_polder_rec,
-        temp_folder_img,
+        temp_folder_img_v1,
+        temp_folder_img_v2,
         temp_folder_png
         ]
     directories = ensure_directories_exist(folders)
@@ -96,53 +101,95 @@ def main():
     central_countries_shapefile = load_shp(path_central_countrys)
     sea_shapefile = load_shp(path_sea)
 
-    # Process background layout
-    list_for_background_layout = {}
+    # Process background layout for palette v1 (original CzechGlobe palette)
+    list_for_background_layout_v1 = {}
     for raster_path in list_of_img:
         process_raster_for_layout(
             raster_path,
-            list_for_background_layout,
+            list_for_background_layout_v1,
             countries_shapefile,
             central_countries_shapefile,
             sea_shapefile,
-            temp_folder_img
+            temp_folder_img_v1,
+            PALETTES_V1,
             )
 
-    # Process backgrounds
-    process_backgrounds(
-        list_of_background,
-        list_for_background_layout,
-        directories[temp_folder_png],
-        )
+    # Process background layout for palette v2
+    list_for_background_layout_v2 = {}
+    for raster_path in list_of_img:
+        process_raster_for_layout(
+            raster_path,
+            list_for_background_layout_v2,
+            countries_shapefile,
+            central_countries_shapefile,
+            sea_shapefile,
+            temp_folder_img_v2,
+            PALETTES_V2,
+            )
+
+
+    templates_dict = {}
+    # Recursively go through all subfolders with templates 
+    for root, _, files in os.walk(path_to_tamplates):
+        template_files = [Path(root) / file for file in files if file.endswith(".png")]
+
+        if template_files:
+            # Determine the corresponding path in the result folder
+            relative_path = Path(root).relative_to(path_to_tamplates)
+            result_path = Path(temp_folder_png) / relative_path
+
+            # Add to the dictionary  
+            templates_dict[result_path] = template_files
+
+    
+    # Add generated rasters to templates  
+    for target_folder, template_list in templates_dict.items():
+        ensure_directory_exists(target_folder)
+
+        # Determine which palette variant needs to be applied  
+        result = os.path.basename(os.path.dirname(target_folder))
+        if result == "templates_v1":
+            list_for_background = list_for_background_layout_v1
+        else:
+            list_for_background = list_for_background_layout_v2
+
+        # Process backgrounds
+        process_backgrounds(
+            template_list,
+            list_for_background,
+            target_folder,
+            )
 
     # Establishing a connection to the SFTP server
-    sftp = connect_to_sftp(sftp_host, sftp_username, sftp_password, int(sftp_port))
+    sftp = connect_to_sftp(
+                        sftp_host, sftp_username, sftp_password, int(sftp_port)
+                        )
 
     # NOTE: Use this path for testing (static folder name)
-    remote_date_path = os.path.join(remote_sftp_dir, "test2")
+    remote_date_path = os.path.join(remote_sftp_dir, "test3")
 
-    # NOTE: Use the following line for production (dynamic folder name based on the current date)
-    # remote_date_path = os.path.join(remote_sftp_dir, today.strftime("%Y-%m-%d"))
+    # # NOTE: Use the following line for production (dynamic folder name based on the current date)
+    # # remote_date_path = os.path.join(remote_sftp_dir, today.strftime("%Y-%m-%d"))
 
     # Uploading a local folder to SFTP
     upload_directory_in_sftp(sftp, temp_folder_png, remote_date_path)
 
-    # NOTE:Deleting the oldest directory
-    # remove_old_sftp_folders(sftp, remote_sftp_dir, 7)
+    # # NOTE:Deleting the oldest directory
+    # # remove_old_sftp_folders(sftp, remote_sftp_dir, 7)
 
     disconnect_from_sftp(sftp)
 
 
-    # Establishing a connection to the FTP server
-    ftp = connect_to_ftp(ftp_host, ftp_username, ftp_password)
+    # # Establishing a connection to the FTP server
+    # ftp = connect_to_ftp(ftp_host, ftp_username, ftp_password)
 
-    # Uploading datas from a local folder to FTP
-    upload_files_to_ftp(ftp, temp_folder_png, remote_ftp_dir)
+    # # Uploading datas from a local folder to FTP
+    # upload_files_to_ftp(ftp, "temp\final_PNG\templates_v1\EN", remote_ftp_dir)
 
-    disconnect_from_ftp(ftp)
+    # disconnect_from_ftp(ftp)
 
-    # Remove temporary directory after processing is complete
-    remove_local_directory(temp_folder)
+    # # Remove temporary directory after processing is complete
+    # remove_local_directory(temp_folder)
 
     # Calculate execution time
     end_time = datetime.now()
