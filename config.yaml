@@ -16,7 +16,6 @@ folders_paths:
 
 # Path to the folder containing model predictions (base images)
 path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
-# path_to_sours: "data/2024-06-20"
 
 # Path to the folder where image templates (frames) are stored
 path_to_tamplates: "data/raster_tamplates/background_tamplates"
