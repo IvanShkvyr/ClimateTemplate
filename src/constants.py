@@ -469,109 +469,69 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(255), np.int64(255), np.int64(242)), # 0
-            (np.int64(255), np.int64(255), np.int64(237)), # 1 
-            (np.int64(255), np.int64(255), np.int64(233)), # 2 
-            (np.int64(255), np.int64(255), np.int64(229)), # 3 
-            (np.int64(255), np.int64(255), np.int64(225)), # 4 
-            (np.int64(255), np.int64(255), np.int64(220)), # 5 
-            (np.int64(255), np.int64(255), np.int64(216)), # 6 
-            (np.int64(255), np.int64(255), np.int64(212)), # 7 
-            (np.int64(255), np.int64(255), np.int64(208)), # 8 
-            (np.int64(255), np.int64(255), np.int64(204)), # 9 
-            (np.int64(255), np.int64(255), np.int64(199)), # 10
-            (np.int64(255), np.int64(255), np.int64(195)), # 11
-            (np.int64(255), np.int64(255), np.int64(191)), # 12
-            (np.int64(255), np.int64(255), np.int64(187)), # 13
-            (np.int64(255), np.int64(255), np.int64(182)), # 14
-            (np.int64(255), np.int64(255), np.int64(178)), # 15
-            (np.int64(255), np.int64(255), np.int64(174)), # 16
-            (np.int64(255), np.int64(255), np.int64(170)), # 17
-            (np.int64(255), np.int64(255), np.int64(166)), # 18
-            (np.int64(255), np.int64(255), np.int64(161)), # 19
-            (np.int64(255), np.int64(255), np.int64(157)), # 20
-            (np.int64(255), np.int64(255), np.int64(153)), # 21
-            (np.int64(255), np.int64(255), np.int64(149)), # 22
-            (np.int64(255), np.int64(255), np.int64(144)), # 23
-            (np.int64(255), np.int64(255), np.int64(140)), # 24
-            (np.int64(255), np.int64(255), np.int64(136)), # 25
-            (np.int64(255), np.int64(255), np.int64(132)), # 26
-            (np.int64(255), np.int64(255), np.int64(128)), # 27
-            (np.int64(255), np.int64(249), np.int64(108)), # 28
-            (np.int64(255), np.int64(244), np.int64(89)), # 29
-            (np.int64(255), np.int64(239), np.int64(70)), # 30
-            (np.int64(255), np.int64(233), np.int64(51)), # 31
-            (np.int64(255), np.int64(228), np.int64(32)), # 32
-            (np.int64(255), np.int64(223), np.int64(13)), # 33
-            (np.int64(253), np.int64(208), np.int64(12)), # 34
-            (np.int64(252), np.int64(193), np.int64(12)), # 35
-            (np.int64(250), np.int64(178), np.int64(11)), # 36
-            (np.int64(249), np.int64(163), np.int64(11)), # 37
-            (np.int64(247), np.int64(148), np.int64(10)), # 38
-            (np.int64(246), np.int64(133), np.int64(10)), # 39
-            (np.int64(245), np.int64(119), np.int64(10)), # 40
-            (np.int64(245), np.int64(111), np.int64(9)), # 41
-            (np.int64(246), np.int64(104), np.int64(8)), # 42
-            (np.int64(246), np.int64(97), np.int64(8)), # 43
-            (np.int64(247), np.int64(90), np.int64(7)), # 44
-            (np.int64(247), np.int64(82), np.int64(7)), # 45
-            (np.int64(248), np.int64(75), np.int64(6)), # 46
-            (np.int64(249), np.int64(68), np.int64(5)), # 47
-            (np.int64(249), np.int64(61), np.int64(5)), # 48
-            (np.int64(250), np.int64(53), np.int64(4)), # 49
-            (np.int64(250), np.int64(46), np.int64(4)), # 50
-            (np.int64(251), np.int64(39), np.int64(3)), # 51
-            (np.int64(252), np.int64(32), np.int64(3)), # 52
-            (np.int64(249), np.int64(31), np.int64(2)), # 53
-            (np.int64(246), np.int64(30), np.int64(2)), # 54
-            (np.int64(244), np.int64(30), np.int64(2)), # 55
-            (np.int64(241), np.int64(29), np.int64(2)), # 56
-            (np.int64(239), np.int64(28), np.int64(2)), # 57
-            (np.int64(236), np.int64(28), np.int64(2)), # 58
-            (np.int64(233), np.int64(27), np.int64(2)), # 59
-            (np.int64(231), np.int64(26), np.int64(2)), # 60
-            (np.int64(228), np.int64(26), np.int64(2)), # 61
-            (np.int64(226), np.int64(25), np.int64(2)), # 62
-            (np.int64(223), np.int64(24), np.int64(2)), # 63
-            (np.int64(221), np.int64(24), np.int64(2)), # 64
-            (np.int64(218), np.int64(23), np.int64(2)), # 65
-            (np.int64(215), np.int64(22), np.int64(2)), # 66
-            (np.int64(213), np.int64(22), np.int64(2)), # 67
-            (np.int64(210), np.int64(21), np.int64(2)), # 68
-            (np.int64(208), np.int64(20), np.int64(1)), # 69
-            (np.int64(205), np.int64(20), np.int64(1)), # 70
-            (np.int64(202), np.int64(19), np.int64(1)), # 71
-            (np.int64(200), np.int64(18), np.int64(1)), # 72
-            (np.int64(197), np.int64(18), np.int64(1)), # 73
-            (np.int64(195), np.int64(17), np.int64(1)), # 74
-            (np.int64(192), np.int64(16), np.int64(1)), # 75
-            (np.int64(190), np.int64(16), np.int64(1)), # 76
-            (np.int64(187), np.int64(15), np.int64(1)), # 77
-            (np.int64(184), np.int64(14), np.int64(1)), # 78
-            (np.int64(182), np.int64(14), np.int64(1)), # 79
-            (np.int64(179), np.int64(13), np.int64(1)), # 80
-            (np.int64(177), np.int64(12), np.int64(1)), # 81
-            (np.int64(174), np.int64(12), np.int64(1)), # 82
-            (np.int64(171), np.int64(11), np.int64(1)), # 83
-            (np.int64(169), np.int64(10), np.int64(1)), # 84
-            (np.int64(166), np.int64(10), np.int64(0)), # 85
-            (np.int64(164), np.int64(9), np.int64(0)), # 86
-            (np.int64(161), np.int64(8), np.int64(0)), # 87
-            (np.int64(159), np.int64(8), np.int64(0)), # 88
-            (np.int64(156), np.int64(7), np.int64(0)), # 89
-            (np.int64(153), np.int64(6), np.int64(0)), # 90
-            (np.int64(151), np.int64(6), np.int64(0)), # 91
-            (np.int64(148), np.int64(5), np.int64(0)), # 92
-            (np.int64(146), np.int64(4), np.int64(0)), # 93
-            (np.int64(143), np.int64(4), np.int64(0)), # 94
-            (np.int64(140), np.int64(3), np.int64(0)), # 95
-            (np.int64(138), np.int64(2), np.int64(0)), # 96
-            (np.int64(135), np.int64(2), np.int64(0)), # 97
-            (np.int64(133), np.int64(1), np.int64(0)), # 98
-            (np.int64(130), np.int64(0), np.int64(0)), # 99
-            (np.int64(128), np.int64(0), np.int64(0)), # 100
+            (np.int64(255), np.int64(255), np.int64(242)), # 24
+            (np.int64(255), np.int64(255), np.int64(242)), # 25
+            (np.int64(255), np.int64(255), np.int64(242)), # 26
+            (np.int64(255), np.int64(255), np.int64(242)), # 27
+            (np.int64(255), np.int64(255), np.int64(128)), # 28 +
+            (np.int64(255), np.int64(255), np.int64(77)), # 29
+            (np.int64(255), np.int64(255), np.int64(38)), # 30 +
+            (np.int64(255), np.int64(247), np.int64(13)), # 31 +
+            (np.int64(255), np.int64(235), np.int64(13)), # 32 +
+            (np.int64(255), np.int64(223), np.int64(13)), # 33 +
+            (np.int64(252), np.int64(204), np.int64(13)), # 34 +
+            (np.int64(252), np.int64(188), np.int64(13)), # 35 +
+            (np.int64(252), np.int64(173), np.int64(13)), # 36 +
+            (np.int64(250), np.int64(159), np.int64(12)), # 37 +
+            (np.int64(247), np.int64(143), np.int64(7)), # 38 +
+            (np.int64(247), np.int64(131), np.int64(7)), # 39 +
+            (np.int64(245), np.int64(119), np.int64(10)), # 40 +
+            (np.int64(245), np.int64(108), np.int64(10)), # 41 +
+            (np.int64(242), np.int64(100), np.int64(12)), # 42 +
+            (np.int64(242), np.int64(93), np.int64(12)), # 43 +
+            (np.int64(242), np.int64(89), np.int64(12)), # 44 +
+            (np.int64(245), np.int64(80), np.int64(10)), # 45 +
+            (np.int64(245), np.int64(76), np.int64(10)), # 46 +
+            (np.int64(247), np.int64(67), np.int64(7)), # 47 +
+            (np.int64(247), np.int64(63), np.int64(7)), # 48 +
+            (np.int64(250), np.int64(54), np.int64(5)), # 49 +
+            (np.int64(250), np.int64(50), np.int64(5)), # 50 +
+            (np.int64(252), np.int64(40), np.int64(3)), # 51 +
+            (np.int64(252), np.int64(32), np.int64(3)), # 52 +
+            (np.int64(255), np.int64(17), np.int64(0)), # 53 +
+            (np.int64(252), np.int64(0), np.int64(0)), # 54 +
+            (np.int64(250), np.int64(0), np.int64(0)), # 55 +
+            (np.int64(245), np.int64(0), np.int64(0)), # 56 +
+            (np.int64(242), np.int64(0), np.int64(0)), # 57 +
+            (np.int64(237), np.int64(0), np.int64(0)), # 58 +
+            (np.int64(235), np.int64(0), np.int64(0)), # 59 +
+            (np.int64(230), np.int64(0), np.int64(0)), # 60 +
+            (np.int64(227), np.int64(0), np.int64(0)), # 61 +
+            (np.int64(222), np.int64(0), np.int64(0)), # 62 +
+            (np.int64(219), np.int64(0), np.int64(0)), # 63 +
+            (np.int64(214), np.int64(0), np.int64(0)), # 64 +
+            (np.int64(209), np.int64(0), np.int64(0)), # 65 +
+            (np.int64(207), np.int64(0), np.int64(0)), # 66 +
+            (np.int64(201), np.int64(0), np.int64(0)), # 67 +
+            (np.int64(199), np.int64(0), np.int64(0)), # 68 +
+            (np.int64(194), np.int64(0), np.int64(0)), # 69 +
+            (np.int64(191), np.int64(0), np.int64(0)), # 70 +
+            (np.int64(186), np.int64(0), np.int64(0)), # 71 +
+            (np.int64(184), np.int64(0), np.int64(0)), # 72 +
+            (np.int64(179), np.int64(0), np.int64(0)), # 73 +
+            (np.int64(173), np.int64(0), np.int64(0)), # 74 +
+            (np.int64(168), np.int64(0), np.int64(0)), # 76 +
+            (np.int64(163), np.int64(0), np.int64(0)), # 78 +
+            (np.int64(158), np.int64(0), np.int64(0)), # 81 +
+            (np.int64(153), np.int64(0), np.int64(0)), # 84 +
+            (np.int64(148), np.int64(0), np.int64(0)), # 87 +
+            (np.int64(143), np.int64(0), np.int64(0)), # 90 +
+            (np.int64(138), np.int64(0), np.int64(0)), # 93 +
+            (np.int64(133), np.int64(0), np.int64(0)), # 96 +
+            (np.int64(128), np.int64(0), np.int64(0)), # 100 +
         ],
-        "boundaries": [-float("inf"), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100],  # Temperature ranges in °C
-        "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100], # Class values for HI data
+        "boundaries": [-float("inf"), 0, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76, 78, 81, 84, 87, 90, 93, 96, 100],  # Temperature ranges in °C
+        "classes": [-999, -1, 0, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76, 78, 81, 84, 87, 90, 93, 96, 100], # Class values for HI data
         "continuous_coloring": False, # Enables continuous color gradient
     },
     "UTCI": {

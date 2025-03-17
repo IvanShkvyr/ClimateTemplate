@@ -83,7 +83,6 @@ def main():
 
     # Create file lists
     list_of_rasters = grab_files(path_to_data)
-    list_of_background = grab_files(path_to_tamplates, extensions=(".png",))
 
     # Create mask shape
     mask_shape = load_data_from_mask_raster(frame_to_raster)
@@ -161,23 +160,23 @@ def main():
             )
 
     # Establishing a connection to the SFTP server
-    sftp = connect_to_sftp(
-                        sftp_host, sftp_username, sftp_password, int(sftp_port)
-                        )
+    # sftp = connect_to_sftp(
+    #                     sftp_host, sftp_username, sftp_password, int(sftp_port)
+    #                     )
 
     # NOTE: Use this path for testing (static folder name)
-    remote_date_path = os.path.join(remote_sftp_dir, "test3")
+    # remote_date_path = os.path.join(remote_sftp_dir, "test3")
 
     # # NOTE: Use the following line for production (dynamic folder name based on the current date)
     # # remote_date_path = os.path.join(remote_sftp_dir, today.strftime("%Y-%m-%d"))
 
     # Uploading a local folder to SFTP
-    upload_directory_in_sftp(sftp, temp_folder_png, remote_date_path)
+    # upload_directory_in_sftp(sftp, temp_folder_png, remote_date_path)
 
     # # NOTE:Deleting the oldest directory
     # # remove_old_sftp_folders(sftp, remote_sftp_dir, 7)
 
-    disconnect_from_sftp(sftp)
+    # disconnect_from_sftp(sftp)
 
 
     # # Establishing a connection to the FTP server
