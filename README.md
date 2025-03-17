@@ -2,9 +2,6 @@
 Project processes climate data by cropping raster files, placing them on a  
 template, and transferring them to an SFTP and FTP server for website integration.
 
-
-Ось текст у форматі одного блоку для копіювання:
-
 ## Requirements
 
 Before using the script, please ensure that the following dependencies are installed:
