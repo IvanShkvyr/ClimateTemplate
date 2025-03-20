@@ -43,7 +43,7 @@ temp_folder_trans = path_config["folders_paths"]["temp_folder_trans"]
 temp_polder_rec = path_config["folders_paths"]["temp_polder_rec"]
 temp_folder_img_v1 = path_config["folders_paths"]["temp_folder_img_v1"]
 temp_folder_img_v2 = path_config["folders_paths"]["temp_folder_img_v2"]
-temp_folder_png = path_config["folders_paths"]["temp_folder_png"]
+temp_folder_final = path_config["folders_paths"]["temp_folder_final"]
 
 path_to_sours = path_config["path_to_sours"]
 
@@ -61,14 +61,14 @@ remote_ftp_dir = path_config["remote_ftp_dir"]
 def main():
     start_time = datetime.now()
 
-    # Get today's date and format the date as YYYY-MM-DD
-    today = date.today()
+    # # Get today's date and format the date as YYYY-MM-DD
+    # today = date.today()
 
-    # Creating a path to the data folder
-    path_to_data = create_data_folder_path(path_to_sours, today)
+    # # Creating a path to the data folder
+    # path_to_data = create_data_folder_path(path_to_sours, today)
 
-    # # # NOTE TEST
-    # path_to_data = path_to_sours
+    # NOTE TEST
+    path_to_data = path_to_sours
 
     # Ensure necessary directories exist
     folders = [
@@ -77,7 +77,7 @@ def main():
         temp_polder_rec,
         temp_folder_img_v1,
         temp_folder_img_v2,
-        temp_folder_png
+        temp_folder_final
         ]
     directories = ensure_directories_exist(folders)
 
@@ -135,7 +135,7 @@ def main():
         if template_files:
             # Determine the corresponding path in the result folder
             relative_path = Path(root).relative_to(path_to_tamplates)
-            result_path = Path(temp_folder_png) / relative_path
+            result_path = Path(temp_folder_final) / relative_path / "Figs"
 
             # Add to the dictionary  
             templates_dict[result_path] = template_files
@@ -160,23 +160,23 @@ def main():
             )
 
     # Establishing a connection to the SFTP server
-    # sftp = connect_to_sftp(
-    #                     sftp_host, sftp_username, sftp_password, int(sftp_port)
-    #                     )
+    sftp = connect_to_sftp(
+                        sftp_host, sftp_username, sftp_password, int(sftp_port)
+                        )
 
     # NOTE: Use this path for testing (static folder name)
-    # remote_date_path = os.path.join(remote_sftp_dir, "test3")
+    remote_date_path = os.path.join(remote_sftp_dir, "test5")
 
     # # NOTE: Use the following line for production (dynamic folder name based on the current date)
     # # remote_date_path = os.path.join(remote_sftp_dir, today.strftime("%Y-%m-%d"))
 
     # Uploading a local folder to SFTP
-    # upload_directory_in_sftp(sftp, temp_folder_png, remote_date_path)
+    upload_directory_in_sftp(sftp, temp_folder_final, remote_date_path)
 
     # # NOTE:Deleting the oldest directory
     # # remove_old_sftp_folders(sftp, remote_sftp_dir, 7)
 
-    # disconnect_from_sftp(sftp)
+    disconnect_from_sftp(sftp)
 
 
     # # Establishing a connection to the FTP server
@@ -186,7 +186,7 @@ def main():
     # upload_files_to_ftp(ftp, "temp\final_PNG\templates_v1\EN", remote_ftp_dir)
 
     # disconnect_from_ftp(ftp)
-
+    
     # # Remove temporary directory after processing is complete
     # remove_local_directory(temp_folder)
 

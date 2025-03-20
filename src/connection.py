@@ -33,17 +33,17 @@ def connect_to_sftp(
     """
     cnopts = pysftp.CnOpts()
     
-    # NOTE: You should use the following block to explicitly load known host keys:
-    #
-    # Example:
-    # cnopts.hostkeys.load(os.path.expanduser('~/.ssh/known_hosts'))
-    #
-    # This will load the host keys from your known_hosts file to verify the server's identity.
-    # It is highly recommended to use host key verification for security purposes.
+    # # NOTE: You should use the following block to explicitly load known host keys:
+    # #
+    # # Example:
+    # # cnopts.hostkeys.load(os.path.expanduser('~/.ssh/known_hosts'))
+    # #
+    # # This will load the host keys from your known_hosts file to verify the server's identity.
+    # # It is highly recommended to use host key verification for security purposes.
     
     # Disabling host key checking (not secure, use for testing only)
     cnopts.hostkeys = None
-
+    
     try:
         # Establishing connection using context manager
         sftp = pysftp.Connection(

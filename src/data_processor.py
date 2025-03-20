@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -6,6 +7,7 @@ from matplotlib.colors import (
     )
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 from pyproj import CRS
 import rasterio
 from rasterio.plot import show
@@ -38,7 +40,7 @@ def convert_coordinate_systen_in_raster(
         None: The function performs the reprojecting and saves the resulting
             raster to the specified output path.
     """
-
+    
     # Open the source raster to check its CRS and other properties
     with rasterio.open(input_path) as src:
 
@@ -71,6 +73,36 @@ def convert_coordinate_systen_in_raster(
 
             # Print a success message once the raster is reprojected and saved
             print(f"Raster reprojected and saved to {output_path}")
+
+
+def convert_png_to_jpg(out_comp_file: str, jpg_file: str) -> None:
+    """
+    Converts a PNG image to a JPG format with compression.
+
+    Args:
+        out_comp_file (str): Path to the input PNG file.
+        jpg_file (str): Path where the converted JPG file will be saved.
+
+    Returns:
+        None: The function saves the converted JPG file to the specified
+            location.
+    """
+    # Convert input paths to Path objects
+    out_comp_file = Path(out_comp_file)
+    jpg_file = Path(jpg_file)
+
+    try:
+        # Open the PNG image
+        with Image.open(out_comp_file) as img:
+            # Convert the image to RGB format
+            rgb_img = img.convert("RGB")
+
+            # Save the image in JPG format with 50% quality to reduce file size
+            rgb_img.save(jpg_file, "JPEG", quality=50)
+
+            print(f"Converted and compressed: {jpg_file}")
+    except Exception as e:
+        print(f"Error during conversion: {e}")
 
 
 def create_visualization_countinious_with_shapefiles(
@@ -407,7 +439,12 @@ def process_backgrounds(
         # Extract date labels from image filenames
         for img in img_list:
             date = img.stem.split("_")[-1]
-            date_labels.append(date)
+
+            formatted_date = datetime.strptime(
+                                                date, "%Y-%m-%d"
+                                                ).strftime("%d.%m.%Y")
+
+            date_labels.append(formatted_date)
 
         # Define the output path for the composite image
         out_comp_file = work_folder / f"{background_type}.png"
@@ -417,6 +454,21 @@ def process_backgrounds(
                                 date_labels,
                                 out_comp_file
                                 )
+        
+        # Get the path. Move up two levels
+        de_folder = Path(out_comp_file).parent.parent
+
+        # Define the path to the "JPG" folder
+        path_to_jpg_folder = de_folder / "JPG"
+
+        # Ensure that the "JPG" folder exists, create it if necessary
+        ensure_directory_exists(path_to_jpg_folder)
+
+        # Construct the new path for the JPG file
+        jpg_file = de_folder / "JPG" / (Path(out_comp_file).stem + ".jpg")
+        
+        # Convert the PNG file to JPG and save it in the specified location
+        convert_png_to_jpg(out_comp_file, jpg_file)
 
 
 def reclassify_raster(

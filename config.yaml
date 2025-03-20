@@ -9,13 +9,14 @@ folders_paths:
   # Path to the temporary folder where reclassified images will be stored
   temp_polder_rec: "temp/reclassified_img"
   # Path to the folder where images with palette colors and country boundaries will be saved
-  temp_folder_img_v1: "temp/processed_images_v1/"
-  temp_folder_img_v2: "temp/processed_images_v2/"
+  temp_folder_img_v1: "temp/final/templates_v1/Data"
+  temp_folder_img_v2: "temp/final/templates_v2/Data"
   # Path to the folder where final PNG images will be saved
-  temp_folder_png: "temp/final_PNG/"
+  temp_folder_final: "temp/final/"
 
 # Path to the folder containing model predictions (base images)
-path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
+# path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
+path_to_sours: "data/2024-06-20"
 
 # Path to the folder where image templates (frames) are stored
 path_to_tamplates: "data/raster_tamplates/background_tamplates"
