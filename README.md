@@ -20,7 +20,10 @@ Before using the script, please ensure that the following dependencies are insta
     - `bg_AWR_0-200cm` # Available Water Reserve 0-200 cm
     - `bg_AWP_0-200cm` # Available Water Potential 0-200 cm
     - `bg_FWI_GenZ`    # Fire Weather Index GenZ
+    - `bg_DFM1H`       # Daily Fire Meteorological Index for 1 hours
     - `bg_DFM10H`      # Daily Fire Meteorological Index for 10 hours
+    - `bg_DFM100H`     # Daily Fire Meteorological Index for 100 hours
+    - `bg_DFM1000H`    # Daily Fire Meteorological Index for 1000 hours
     - `bg_HI`          # Heat Index
     - `bg_UTCI`        # Universal Thermal Climate Index
 
@@ -32,22 +35,22 @@ The directory structure should look like this:
 ├── data/ 
 │      ├── raster_templates 
 │      │      └── background_templates
-│      │              ├── templates_v1
-│      │              │      ├── CZ
-│      │              │      ├── DE
-│      │              │      ├── EN
-│      │              │      ├── HR
-│      │              │      ├── PL
-│      │              │      ├── SI
-│      │              │      └── SK
-│      │              └── templates_v2
-│      │                      ├── CZ
-│      │                      ├── DE
-│      │                      ├── EN
-│      │                      ├── HR
-│      │                      ├── PL
-│      │                      ├── SI
-│      │                      └── SK
+│      │              ├── normal
+│      │              │      ├── cs
+│      │              │      ├── de
+│      │              │      ├── en
+│      │              │      ├── hr
+│      │              │      ├── pl
+│      │              │      ├── sk
+│      │              │      └── sl
+│      │              └── reduced
+│      │                      ├── cs
+│      │                      ├── de
+│      │                      ├── en
+│      │                      ├── hr
+│      │                      ├── pl
+│      │                      ├── sk
+│      │                      └── sl
 ```
 
 - Additionally, create a `.env` file in the root directory with the following content:
@@ -61,13 +64,8 @@ The directory structure should look like this:
 The `.env` file should contain the following environment variables:
 
 ```
-SFTP_HOST=your_host
-SFTP_USERNAME=your_username
-SFTP_PASSWORD=your_password
-SFTP_PORT=22
-FTP_HOST=your_host
-FTP_USERNAME=your_username
-FTP_PASSWORD=your_password
+API_USERNAME=your_username
+API_PASSWORD=your_password
 ```
 
 - The script is configured to work with data available at `//monospace/mendelu/`. Please ensure that you have access to this resource before using the script. Additionally, note that the data used by the script (as of today) may not yet be available on this resource.

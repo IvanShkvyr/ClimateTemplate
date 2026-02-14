@@ -110,7 +110,52 @@ PALETTES_V2 = {
         "classes": [-999, -1, 1, 2, 3, 4, 5, 6], # Class values for FWI data
         "continuous_coloring": False, # Enables continuous color gradient
     },
-    "DFM10H": {
+    "DFM1H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (178, 24, 43),  # Less than 6 %
+            (214, 96, 77),  # 6–9 %
+            (244, 165, 130),  # 9–12 %
+            (253, 219, 199),  # 12–15 %
+            (224, 224, 224),  # 15–25 %
+            (186, 186, 186),  # 25–35 %
+        ],
+        "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
+        "DFM10H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (178, 24, 43),  # Less than 6 %
+            (214, 96, 77),  # 6–9 %
+            (244, 165, 130),  # 9–12 %
+            (253, 219, 199),  # 12–15 %
+            (224, 224, 224),  # 15–25 %
+            (186, 186, 186),  # 25–35 %
+        ],
+        "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
+        "DFM100H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (178, 24, 43),  # Less than 6 %
+            (214, 96, 77),  # 6–9 %
+            (244, 165, 130),  # 9–12 %
+            (253, 219, 199),  # 12–15 %
+            (224, 224, 224),  # 15–25 %
+            (186, 186, 186),  # 25–35 %
+        ],
+        "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
+        "DFM1000H": {
         "colors": [
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
@@ -757,6 +802,51 @@ PALETTES_V1 = {
         "classes": [-999, -1, 1, 2, 3, 4, 5, 6], # Class values for FWI data
         "continuous_coloring": False, # Enables continuous color gradient
     },
+    "DFM1H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (np.int64(115), np.int64(0), np.int64(0)), # 0
+            (np.int64(127), np.int64(7), np.int64(0)), # 1     
+            (np.int64(140), np.int64(15), np.int64(0)), # 2    
+            (np.int64(153), np.int64(23), np.int64(0)), # 3    
+            (np.int64(173), np.int64(32), np.int64(0)), # 4    
+            (np.int64(193), np.int64(41), np.int64(0)), # 5    
+            (np.int64(214), np.int64(50), np.int64(0)), # 6    
+            (np.int64(224), np.int64(76), np.int64(10)), # 7   
+            (np.int64(234), np.int64(102), np.int64(21)), # 8  
+            (np.int64(245), np.int64(128), np.int64(32)), # 9  
+            (np.int64(247), np.int64(158), np.int64(45)), # 10 
+            (np.int64(249), np.int64(188), np.int64(58)), # 11 
+            (np.int64(252), np.int64(219), np.int64(71)), # 12 
+            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(254), np.int64(234), np.int64(117)), # 14
+            (np.int64(255), np.int64(242), np.int64(140)), # 15
+            (np.int64(255), np.int64(246), np.int64(165)), # 16
+            (np.int64(255), np.int64(250), np.int64(191)), # 17
+            (np.int64(255), np.int64(255), np.int64(217)), # 18
+            (np.int64(223), np.int64(231), np.int64(214)), # 19
+            (np.int64(192), np.int64(207), np.int64(211)), # 20
+            (np.int64(161), np.int64(183), np.int64(209)), # 21
+            (np.int64(136), np.int64(164), np.int64(202)), # 22
+            (np.int64(111), np.int64(146), np.int64(196)), # 23
+            (np.int64(86), np.int64(127), np.int64(190)), # 24 
+            (np.int64(62), np.int64(109), np.int64(184)), # 25 
+            (np.int64(55), np.int64(98), np.int64(174)), # 26  
+            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(43), np.int64(76), np.int64(154)), # 28
+            (np.int64(37), np.int64(65), np.int64(144)), # 29
+            (np.int64(31), np.int64(55), np.int64(134)), # 30
+            (np.int64(27), np.int64(46), np.int64(125)), # 31
+            (np.int64(23), np.int64(37), np.int64(116)), # 32
+            (np.int64(19), np.int64(28), np.int64(107)), # 33
+            (np.int64(15), np.int64(19), np.int64(98)), # 34
+            (np.int64(11), np.int64(11), np.int64(89)), # 35
+        ],
+        "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
     "DFM10H": {
         "colors": [
             (255, 255, 255),  # -999 (NoData)
@@ -801,24 +891,117 @@ PALETTES_V1 = {
         "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
         "continuous_coloring": False, # Enables continuous color gradient
-    }
+    },
+    "DFM100H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (np.int64(115), np.int64(0), np.int64(0)), # 0
+            (np.int64(127), np.int64(7), np.int64(0)), # 1     
+            (np.int64(140), np.int64(15), np.int64(0)), # 2    
+            (np.int64(153), np.int64(23), np.int64(0)), # 3    
+            (np.int64(173), np.int64(32), np.int64(0)), # 4    
+            (np.int64(193), np.int64(41), np.int64(0)), # 5    
+            (np.int64(214), np.int64(50), np.int64(0)), # 6    
+            (np.int64(224), np.int64(76), np.int64(10)), # 7   
+            (np.int64(234), np.int64(102), np.int64(21)), # 8  
+            (np.int64(245), np.int64(128), np.int64(32)), # 9  
+            (np.int64(247), np.int64(158), np.int64(45)), # 10 
+            (np.int64(249), np.int64(188), np.int64(58)), # 11 
+            (np.int64(252), np.int64(219), np.int64(71)), # 12 
+            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(254), np.int64(234), np.int64(117)), # 14
+            (np.int64(255), np.int64(242), np.int64(140)), # 15
+            (np.int64(255), np.int64(246), np.int64(165)), # 16
+            (np.int64(255), np.int64(250), np.int64(191)), # 17
+            (np.int64(255), np.int64(255), np.int64(217)), # 18
+            (np.int64(223), np.int64(231), np.int64(214)), # 19
+            (np.int64(192), np.int64(207), np.int64(211)), # 20
+            (np.int64(161), np.int64(183), np.int64(209)), # 21
+            (np.int64(136), np.int64(164), np.int64(202)), # 22
+            (np.int64(111), np.int64(146), np.int64(196)), # 23
+            (np.int64(86), np.int64(127), np.int64(190)), # 24 
+            (np.int64(62), np.int64(109), np.int64(184)), # 25 
+            (np.int64(55), np.int64(98), np.int64(174)), # 26  
+            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(43), np.int64(76), np.int64(154)), # 28
+            (np.int64(37), np.int64(65), np.int64(144)), # 29
+            (np.int64(31), np.int64(55), np.int64(134)), # 30
+            (np.int64(27), np.int64(46), np.int64(125)), # 31
+            (np.int64(23), np.int64(37), np.int64(116)), # 32
+            (np.int64(19), np.int64(28), np.int64(107)), # 33
+            (np.int64(15), np.int64(19), np.int64(98)), # 34
+            (np.int64(11), np.int64(11), np.int64(89)), # 35
+        ],
+        "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
+    "DFM1000H": {
+        "colors": [
+            (255, 255, 255),  # -999 (NoData)
+            (255, 255, 255),  # -1 (NoData)
+            (np.int64(115), np.int64(0), np.int64(0)), # 0
+            (np.int64(127), np.int64(7), np.int64(0)), # 1     
+            (np.int64(140), np.int64(15), np.int64(0)), # 2    
+            (np.int64(153), np.int64(23), np.int64(0)), # 3    
+            (np.int64(173), np.int64(32), np.int64(0)), # 4    
+            (np.int64(193), np.int64(41), np.int64(0)), # 5    
+            (np.int64(214), np.int64(50), np.int64(0)), # 6    
+            (np.int64(224), np.int64(76), np.int64(10)), # 7   
+            (np.int64(234), np.int64(102), np.int64(21)), # 8  
+            (np.int64(245), np.int64(128), np.int64(32)), # 9  
+            (np.int64(247), np.int64(158), np.int64(45)), # 10 
+            (np.int64(249), np.int64(188), np.int64(58)), # 11 
+            (np.int64(252), np.int64(219), np.int64(71)), # 12 
+            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(254), np.int64(234), np.int64(117)), # 14
+            (np.int64(255), np.int64(242), np.int64(140)), # 15
+            (np.int64(255), np.int64(246), np.int64(165)), # 16
+            (np.int64(255), np.int64(250), np.int64(191)), # 17
+            (np.int64(255), np.int64(255), np.int64(217)), # 18
+            (np.int64(223), np.int64(231), np.int64(214)), # 19
+            (np.int64(192), np.int64(207), np.int64(211)), # 20
+            (np.int64(161), np.int64(183), np.int64(209)), # 21
+            (np.int64(136), np.int64(164), np.int64(202)), # 22
+            (np.int64(111), np.int64(146), np.int64(196)), # 23
+            (np.int64(86), np.int64(127), np.int64(190)), # 24 
+            (np.int64(62), np.int64(109), np.int64(184)), # 25 
+            (np.int64(55), np.int64(98), np.int64(174)), # 26  
+            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(43), np.int64(76), np.int64(154)), # 28
+            (np.int64(37), np.int64(65), np.int64(144)), # 29
+            (np.int64(31), np.int64(55), np.int64(134)), # 30
+            (np.int64(27), np.int64(46), np.int64(125)), # 31
+            (np.int64(23), np.int64(37), np.int64(116)), # 32
+            (np.int64(19), np.int64(28), np.int64(107)), # 33
+            (np.int64(15), np.int64(19), np.int64(98)), # 34
+            (np.int64(11), np.int64(11), np.int64(89)), # 35
+        ],
+        "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
+        "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
+        "continuous_coloring": False, # Enables continuous color gradient
+    },
 }
 
 
 # List of parameter names representing different types of climate data
 # These are used to search for corresponding images and templates.
 PARAMETERS = [
-    "AWD_0-40",  # Available Water Depth 0-40 cm
-    "AWR_0-40",  # Available Water Reserve 0-40 cm
-    "AWP_0-40",  # Available Water Potential 0-40 cm
-    "AWD_0-100", # Available Water Depth 0-100 cm
-    "AWR_0-100", # Available Water Reserve 0-100 cm
-    "AWP_0-100", # Available Water Potential 0-100 cm
-    "AWD_0-200", # Available Water Depth 0-200 cm
-    "AWR_0-200", # Available Water Reserve 0-200 cm
-    "AWP_0-200", # Available Water Potential 0-200 cm
+    "AWD_0-40cm",  # Available Water Depth 0-40 cm
+    "AWR_0-40cm",  # Available Water Reserve 0-40 cm
+    "AWP_0-40cm",  # Available Water Potential 0-40 cm
+    "AWD_0-100cm", # Available Water Depth 0-100 cm
+    "AWR_0-100cm", # Available Water Reserve 0-100 cm
+    "AWP_0-100cm", # Available Water Potential 0-100 cm
+    "AWD_0-200cm", # Available Water Depth 0-200 cm
+    "AWR_0-200cm", # Available Water Reserve 0-200 cm
+    "AWP_0-200cm", # Available Water Potential 0-200 cm
     "FWI_GenZ",  # Fire Weather Index GenZ
+    "DFM1H",    # Daily Fire Meteorological Index for 1 hours
     "DFM10H",    # Daily Fire Meteorological Index for 10 hours
+    "DFM100H",    # Daily Fire Meteorological Index for 100 hours
+    "DFM1000H",    # Daily Fire Meteorological Index for 1000 hours
     "HI",        # Heat Index
     "UTCI",      # Universal Thermal Climate Index
 ]
@@ -828,4 +1011,7 @@ PARAMETERS = [
 # EPSG:3857 refers to the Web Mercator projection, which is commonly used for
 # web-based mapping and is the chosen CRS for the project.
 CRS_FOR_DATA = CRS.from_epsg(3857)
+
+
+RETRY_INTERVAL = 900  # TODO seconds
 

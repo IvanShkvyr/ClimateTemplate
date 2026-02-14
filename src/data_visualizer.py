@@ -1,75 +1,111 @@
-from PIL import Image, ImageDraw, ImageFont
+from dataclasses import dataclass
+import logging
+
 from pathlib import Path
+import os
+from tqdm import tqdm
 
-from src.data_loader import load_config
+from src.data_loader import load_visual_shapefiles
+from src.constants import PALETTES_V1, PALETTES_V2
+from src.raster_utils import process_raster_for_layout, rename_and_copy_images
 
 
-path_config = load_config("config.yaml")
-
-font_path = path_config["font_path"]
 
 
-def combine_maps_with_layout(
-                            background_path: Path,
-                            maps_list: list[Path],
-                            labels_list: list[str],
-                            output_path: Path,
-                            font_path: str = font_path
-                            ) -> None:
+
+@dataclass(frozen=True)
+class PaletteConfig:
+    name: str
+    palettes: dict
+    temp_dir: Path
+    final_dir: Path
+
+
+def select_palette(target_folder: Path, visualizations: dict):
     """
-    Combines map images with a background layout and adds labels.
-
-    This function places map images on a background layout, arranges them in a
-    grid, and adds labels below each map. It then saves the final composition to
-    a specified output file.
-
-    Args:
-        background_path (Path): The path to the background image.
-        maps_list (list[Path]): A list of paths to the map images to be added.
-        labels_list (list[str]): A list of labels corresponding to each map.
-        output_path (Path): The path where the final composition will be saved.
-        font_path (str, optional): The path to the font file used for labels.
-
-    Returns:
-        None: The function saves the final layout as a PNG file to the specified
-            output path.
+    Select visualization layout based on target folder structure.
     """
-    # Load the background layout
-    background = Image.open(background_path).convert("RGBA")
+    parent_name = target_folder.parent.name
 
-    # Specify positioning and dimensions for maps and labels
-    start_x = 24
-    start_y = 94
-    map_width = 850
-    map_height = 906
-    step_x = map_width + 18  # Horizontal step between maps
-    step_y = map_height + 122  # Vertical step
+    if parent_name not in visualizations:
+        raise ValueError(f"Unknown palette folder: {parent_name}")
 
-    # Create a drawing object for adding labels
-    draw = ImageDraw.Draw(background)
-    font = ImageFont.truetype(font_path, size=62)
+    return visualizations[parent_name]
 
-    # Iterate through maps and place them on the background
-    for idx, (map_path, label) in enumerate(zip(maps_list, labels_list)):
-        # Calculate position
-        row = idx // 5  # Create a new row every 5 maps
-        col = idx % 5   # Place maps in a horizontal line (max 5 in a row)
 
-        x = start_x + col * step_x
-        y = start_y + row * step_y
+def generate_palette_images(
+        rasters: list,
+        palette_cfg: PaletteConfig,
+        shapefiles: dict,
+        logger: logging.Logger
+    ) -> dict:
+    """
+    Generate visualization images for a singl palette variant.
+    """
+    logger.info(f"Start visualization for palette: {palette_cfg.name}")
 
-        # Open map image
-        map_image = Image.open(map_path).convert("RGBA")
-        map_image = map_image.resize((map_width, map_height))
+    layout_index = {}
 
-        # Paste the map on the background
-        background.paste(map_image, (x, y))
+    for raster_path in tqdm(rasters, desc=palette_cfg.name):
+        process_raster_for_layout(
+            raster_path=raster_path,
+            list_for_background_layout=layout_index,
+            countries_shapefile=shapefiles["countries"],
+            central_countries_shapefile=shapefiles["central"],
+            sea_shapefile=shapefiles["sea"],
+            work_folder=palette_cfg.temp_dir,
+            palettes=palette_cfg.palettes,
+            )
+        
+    logger.info(f"копіювання і перейменування для сайту")
 
-        # Add label below the map
-        label_x = x + 42
-        label_y = y - 79
-        draw.text((label_x, label_y), label, fill="black", font=font)
+    rename_and_copy_images(
+        list_for_background_layout=layout_index,
+        src_root=palette_cfg.temp_dir,
+        dst_root=palette_cfg.final_dir,
+        )
 
-    # Save the final image
-    background.save(output_path, "PNG", optimize=True, dpi=(300, 300))
-    print(f"Layout saved to {output_path}")
+    logger.info(f"Finished palette: {palette_cfg.name}")
+
+    return layout_index
+
+
+def generate_visualizations(
+                            config: dict,
+                            rasters: list,
+                            directories: dict,
+                            logger: logging.Logger
+                            ) -> dict:
+    """
+    Orchestrates visualization generation for all pallete variants.
+    """
+    # Load shapefiles
+    shapefiles = load_visual_shapefiles(config)
+    logger.info(f"Loaded basic shapefiles")
+
+    palette_configs = [
+        PaletteConfig(
+            name="normal",
+            palettes=PALETTES_V1,
+            temp_dir=directories["normal_data"],
+            final_dir=directories["final_normal"]
+        ),
+        PaletteConfig(
+            name="reduced",
+            palettes=PALETTES_V2,
+            temp_dir=directories["reduced_data"],
+            final_dir=directories["final_reduced"]
+        ),
+    ]
+
+    visualization_results = {}
+
+    for palette_cfg in palette_configs:
+        visualization_results[palette_cfg.name] = generate_palette_images(
+            rasters=rasters,
+            palette_cfg=palette_cfg,
+            shapefiles=shapefiles,
+            logger=logger,
+        )
+
+    return visualization_results

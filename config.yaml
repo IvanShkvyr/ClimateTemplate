@@ -9,14 +9,18 @@ folders_paths:
   # Path to the temporary folder where reclassified images will be stored
   temp_polder_rec: "temp/reclassified_img"
   # Path to the folder where images with palette colors and country boundaries will be saved
-  temp_folder_img_v1: "temp/final/templates_v1/Data"
-  temp_folder_img_v2: "temp/final/templates_v2/Data"
+  temp_folder_img_v1: "temp/normal/Data"
+  temp_folder_img_v2: "temp/reduced/Data"
+  # Path to the folder where images with palette colors and country boundaries will be saved
+  temp_final_img_v1: "temp/final/layers/normal"
+  temp_final_img_v2: "temp/final/layers/reduced"
   # Path to the folder where final PNG images will be saved
-  temp_folder_final: "temp/final/"
+  temp_folder_final: "temp/final/downloads/"
+
+  folder_to_send: "temp/final/"
 
 # Path to the folder containing model predictions (base images)
-# path_to_sours: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
-path_to_sours: "data/2024-06-20"
+path_to_source: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
 
 # Path to the folder where image templates (frames) are stored
 path_to_tamplates: "data/raster_tamplates/background_tamplates"
@@ -27,17 +31,16 @@ frame_to_raster: "data/raster_tamplates/extent/extent_operativa.tif"
 # Paths to shapefiles
 shapefiles_paths:
   # Path to the shapefile containing country boundaries
-  path_countrys: "data/shapefiles/country.shp"
+  path_countries: "data/shapefiles/country.shp"
   # Path to the shapefile containing target country boundaries (countries to highlight)
-  path_central_countrys: "data/shapefiles/country_domena.shp"
+  path_central_countries: "data/shapefiles/country_domena.shp"
   # Path to the shapefile containing sea boundaries
   path_sea: "data/shapefiles/sea.shp"
 
 # Path to the font file that is used in templates
-font_path: "data\\font\\Roboto-Regular.ttf"
+font_path: "data/font/Roboto-Regular.ttf"
 
-# This is the directory on the SFTP server where completed images will be uploaded for the website.
-remote_sftp_dir: "data/"
+# Base URL of the website/API where generated images are published
+clim4cast:
+  base_url: "https://clim4cast.eu/api/"
 
-# This is the directory on the FTP server where completed images will be uploaded for the website.
-remote_ftp_dir: "/firerisk/maps/"

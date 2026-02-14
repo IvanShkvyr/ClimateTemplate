@@ -1,6 +1,10 @@
 from datetime import date
+from dotenv import load_dotenv
+import logging
 from pathlib import Path
+import os
 import shutil
+import time
 
 import geopandas as gpd
 from pyproj import CRS
@@ -9,7 +13,7 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 import yaml
 
-from src.constants import CRS_FOR_DATA, PARAMETERS
+from src.constants import CRS_FOR_DATA, PARAMETERS, RETRY_INTERVAL
 
 
 def create_data_folder_path(main_path: str, today: date) -> str:
@@ -35,6 +39,41 @@ def create_data_folder_path(main_path: str, today: date) -> str:
     final_path = main_path + "/" + year + "/" + day
 
     return final_path
+
+
+def load_visual_shapefiles(config: dict) -> dict:
+    """
+    Load shapefiles
+    """
+    return {
+    "countries": load_shp(config["shapefiles_paths"]["path_countries"]),
+    "central": load_shp(config["shapefiles_paths"]["path_central_countries"]),
+    "sea": load_shp(config["shapefiles_paths"]["path_sea"]),
+    }
+
+
+def wait_for_input_data(
+        config: dict,
+        logger: logging.Logger,
+        retry_interval: int = RETRY_INTERVAL
+        ) -> str:
+    """
+    Wait until today's input data folder exists
+    """
+    path_to_source = config["path_to_source"]
+
+    today = date.today()
+    # Creating a path to the data folder
+    path_to_data = create_data_folder_path(path_to_source, today)
+
+
+    while not (Path(path_to_data)).exists():
+        logger.warning(f"Input data folder not found."
+                f"Image generation process will retry in"
+                f" {int(retry_interval/60)} minutes.")
+        time.sleep(retry_interval)
+
+    return path_to_data
 
 
 def grab_files(
@@ -92,8 +131,24 @@ def load_config(file_path: str) -> dict:
             the YAML file.
     """
     # Open the YAML file in read mode
-    with open(file_path, "r") as file:
-        config = yaml.safe_load(file)
+    with open(file_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    return config
+
+
+def load_app_config(config_path: str = "config.yaml") -> dict:
+    """
+    Load application configuration.
+    """
+    load_dotenv()
+
+    config = load_config(config_path)
+
+    # Inject API password and username
+
+    config["clim4cast"]["username"] = os.getenv("API_USERNAME")
+    config["clim4cast"]["password"] = os.getenv("API_PASSWORD")
 
     return config
 
@@ -218,3 +273,5 @@ def remove_local_directory(temp_path: str) -> None:
     # Check if the directory exists and is indeed a directory
     if temp_folder.exists() and temp_folder.is_dir():
         shutil.rmtree(temp_folder)
+
+
