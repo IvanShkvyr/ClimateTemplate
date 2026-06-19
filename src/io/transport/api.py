@@ -7,6 +7,8 @@ from pathlib import Path
 import requests
 import os
 
+from src.core.config import AppConfig
+
 
 RED = "\033[91m"
 GREEN = "\033[92m"
@@ -14,7 +16,7 @@ RESET = "\033[0m"
 
 
 async def upload_results_async(
-        config: dict, directories: dict, logger: logging.Logger
+        config: AppConfig, logger: logging.Logger
         ) -> None:
     """
     Orchestrates async upload of generated images via API
@@ -22,10 +24,10 @@ async def upload_results_async(
 
     logger.info(f"Start uploading a final folder")
     uploaded = await upload_files_to_api_async(
-                        base_url=config["clim4cast"]["base_url"],
-                        username=config["clim4cast"]["username"],
-                        password=config["clim4cast"]["password"],
-                        root_folder=directories["folder_to_send"],
+                        base_url=config.api.base_url,
+                        username=config.api.username,
+                        password=config.api.password,
+                        root_folder=config.folders.to_send,
                         logger=logger,
                         )
     logger.info(f"Upload finished. Uploaded {len(uploaded)} files via API")

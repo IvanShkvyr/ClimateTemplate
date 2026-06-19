@@ -3,12 +3,17 @@ import asyncio
 
 sys.path.append('D:/CzechGlobe/Task/task_28_Clim4Cast_New_redaction/c4c_website/image-generation')
 
-from src.data_loader import load_app_config, wait_for_input_data
-from src.data_processor import generate_base_raster
-from src.data_visualizer import generate_visualizations
-from src.enviroment import prepere_enviroment, generate_templates, cleanup
-from src.transport.api import upload_results_async
-from src.logging_utils import setup_logger
+from src.core.config import load_app_config
+from src.core.logging_conf import setup_logger
+from src.io.local_storage import (
+                                    wait_for_input_data,
+                                    prepare_environment,
+                                    cleanup
+                                    )
+from src.io.transport.api import upload_results_async
+from src.services.raster_processor import generate_base_raster
+from src.services.visualizer import generate_visualizations
+from src.services.template_engine import generate_templates
 
 
 async def main() -> None:
@@ -17,31 +22,34 @@ async def main() -> None:
     """
 
     logger = setup_logger()
-    logger.info(f"---------START--------")
-
-    directories = None
+    logger.info(f"--------- Pipeline Execution Started --------")
 
     try:
         config = load_app_config()
 
+        # Waiting for data and preparing the environment
         path_to_data = wait_for_input_data(config, logger)
-        directories = prepere_enviroment(config, logger)
+        prepare_environment(config, logger)
 
+        # 1. Creating basic
         list_img = generate_base_raster(
             path_to_data,
             config,
-            directories,
-            logger
+            logger,
             )
+        
+        # 2. Creating vizualization (PNG files)
         visualizations = generate_visualizations(
                                 config,
                                 list_img,
-                                directories,
                                 logger
                                 )
-        generate_templates(config, visualizations, directories, logger)
 
-        await upload_results_async(config, directories, logger)
+        # 3. Adding raster data to templates
+        generate_templates(config, visualizations, logger)
+
+        # 4. Uploading results asynchronously
+        await upload_results_async(config, logger)
 
         logger.info(f"Pipeline finished successfully.")
 
@@ -49,14 +57,12 @@ async def main() -> None:
         logger.exception(f"Pipeline failed: {exc}")
 
     finally:
-        if directories:
-            cleanup(directories, logger)
+        if config: 
+            cleanup(config, logger)
+            logger.info(f"Temporary directories cleaned up.")   
 
-        logger.info(f"---------FINISH--------")
+        logger.info(f"--------- Pipeline Execution Finished --------")
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-
-
+    asyncio.run(main())

@@ -1,11 +1,11 @@
 import logging
 
-path_to_log_file = "logger.log"
-logger_level = logging.DEBUG # logging.INFO logging.DEBUG
+DEFAULT_LOG_FILE = "logger.log"
+DEFAULT_LEVEL = logging.DEBUG # logging.INFO logging.DEBUG
 
 def setup_logger(
-        log_file: str = path_to_log_file,
-        logger_level: int = logger_level,
+        log_file: str = DEFAULT_LOG_FILE,
+        logger_level: int = DEFAULT_LEVEL,
         log_name: str = "image_generation",
         ) -> logging.Logger:
     """
@@ -13,15 +13,25 @@ def setup_logger(
 
     Parameters:
         log_file (str): path to log file.
-        logger_lavel (int): logging level.
+        logger_level (int): logging level.
         log_name (str): log file name.
 
     Return:
         logging.Logger: Configured logger instance
     """
     logger = logging.getLogger(log_name)
+
+    if logger.hasHandlers():
+        return logger
+
     logger.setLevel(logger_level)
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        fmt=(
+            "%(asctime)s - [%(levelname)s] - %(name)s"
+            " - (%(filename)s:%(lineno)d) - %(message)s"
+            ),
+        datefmt="%Y-%m-%d %H:%M:%S",
+        )
 
     #Console handler
     console_handler = logging.StreamHandler()
@@ -36,4 +46,8 @@ def setup_logger(
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
+    logger.propagate = False
+
     return logger
+
+
