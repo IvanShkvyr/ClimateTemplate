@@ -26,3 +26,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["clim4cast_imagegen*"]
+
+[project.scripts]
+clim4cast-imagegen = "clim4cast_imagegen.cli:run"
