@@ -1,7 +1,4 @@
-import sys
 import asyncio
-
-sys.path.append('D:/CzechGlobe/Task/task_28_Clim4Cast_New_redaction/c4c_website/image-generation')
 
 from clim4cast_imagegen.core.config import load_app_config
 from clim4cast_imagegen.core.logging_conf import setup_logger
