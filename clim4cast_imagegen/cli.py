@@ -61,6 +61,6 @@ async def main() -> None:
 
         logger.info(f"--------- Pipeline Execution Finished --------")
 
-
-if __name__ == "__main__":
+def run() -> None:
+    """Synchronous entry point: runs the async pipeline once."""
     asyncio.run(main())
