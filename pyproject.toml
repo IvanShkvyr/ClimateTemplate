@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clim4cast-imagegen"
+version = "0.1.0"
+description = "Pipeline that generates climate map images for the website"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "aiohttp",
+    "geopandas",
+    "matplotlib",
+    "numpy",
+    "paramiko",
+    "pillow",
+    "pyproj",
+    "pysftp",
+    "python-dotenv",
+    "pyyaml",
+    "rasterio",
+    "requests",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+include = ["clim4cast_imagegen*"]
