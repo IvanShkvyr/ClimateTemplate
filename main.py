@@ -3,17 +3,17 @@ import asyncio
 
 sys.path.append('D:/CzechGlobe/Task/task_28_Clim4Cast_New_redaction/c4c_website/image-generation')
 
-from src.core.config import load_app_config
-from src.core.logging_conf import setup_logger
-from src.io.local_storage import (
+from clim4cast_imagegen.core.config import load_app_config
+from clim4cast_imagegen.core.logging_conf import setup_logger
+from clim4cast_imagegen.io.local_storage import (
                                     wait_for_input_data,
                                     prepare_environment,
                                     cleanup
                                     )
-from src.io.transport.api import upload_results_async
-from src.services.raster_processor import generate_base_raster
-from src.services.visualizer import generate_visualizations
-from src.services.template_engine import generate_templates
+from clim4cast_imagegen.io.transport.api import upload_results_async
+from clim4cast_imagegen.services.raster_processor import generate_base_raster
+from clim4cast_imagegen.services.visualizer import generate_visualizations
+from clim4cast_imagegen.services.template_engine import generate_templates
 
 
 async def main() -> None:
@@ -49,7 +49,7 @@ async def main() -> None:
         generate_templates(config, visualizations, logger)
 
         # 4. Uploading results asynchronously
-        await upload_results_async(config, logger)
+        # await upload_results_async(config, logger)                            # TODO
 
         logger.info(f"Pipeline finished successfully.")
 
@@ -58,7 +58,8 @@ async def main() -> None:
 
     finally:
         if config: 
-            cleanup(config, logger)
+
+            # cleanup(config, logger)                                           # TODO   
             logger.info(f"Temporary directories cleaned up.")   
 
         logger.info(f"--------- Pipeline Execution Finished --------")

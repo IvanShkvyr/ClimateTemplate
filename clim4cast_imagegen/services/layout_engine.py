@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from src.utils.pathname_utils import get_background_type, extract_date
+from clim4cast_imagegen.utils.pathname_utils import get_background_type, extract_date
 
 
 def combine_maps_with_layout(

@@ -6,8 +6,8 @@ import shutil
 from typing import Iterable
 import time
 
-from src.core.constants import PARAMETERS, RETRY_INTERVAL
-from src.core.config import AppConfig
+from clim4cast_imagegen.core.constants import PARAMETERS, RETRY_INTERVAL
+from clim4cast_imagegen.core.config import AppConfig
 
 
 def prepare_environment(config: AppConfig, logger: logging.Logger) -> None:

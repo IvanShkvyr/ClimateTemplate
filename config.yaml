@@ -7,7 +7,7 @@ folders_paths:
   # Path to the temporary folder where transformed images will be stored
   temp_folder_trans: "temp/transformed_img"
   # Path to the temporary folder where reclassified images will be stored
-  temp_polder_rec: "temp/reclassified_img"
+  temp_folder_rec: "temp/reclassified_img"
   # Path to the folder where images with palette colors and country boundaries will be saved
   temp_folder_img_v1: "temp/normal/Data"
   temp_folder_img_v2: "temp/reduced/Data"
@@ -23,10 +23,10 @@ folders_paths:
 path_to_source: "//monospace/mendelu/Windy/SoilClim2_Windy/Prediction"
 
 # Path to the folder where image templates (frames) are stored
-path_to_tamplates: "data/raster_tamplates/background_tamplates"
+path_to_tamplates: "data/raster_templates/background_templates"
 
 # Path to the raster file containing area of interest parameters (frame)
-frame_to_raster: "data/raster_tamplates/extent/extent_operativa.tif"
+frame_to_raster: "data/raster_templates/extent/extent_operativa.tif"
 
 # Paths to shapefiles
 shapefiles_paths:

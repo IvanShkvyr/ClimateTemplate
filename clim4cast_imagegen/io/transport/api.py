@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 import os
 
-from src.core.config import AppConfig
+from clim4cast_imagegen.core.config import AppConfig
 
 
 RED = "\033[91m"

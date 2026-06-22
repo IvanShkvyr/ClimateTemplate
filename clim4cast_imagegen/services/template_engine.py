@@ -5,9 +5,9 @@ from multiprocessing import cpu_count
 from pathlib import Path
 import os
 
-from src.core.config import AppConfig
-from src.services.layout_engine import combine_maps_with_layout
-from src.utils.palette_utils import select_palette
+from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.services.layout_engine import combine_maps_with_layout
+from clim4cast_imagegen.utils.palette_utils import select_palette
 
 
 def collect_templates(template_root: Path) -> dict:

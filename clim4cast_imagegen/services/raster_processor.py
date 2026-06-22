@@ -7,15 +7,15 @@ import rasterio
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 from tqdm import tqdm
 
-from src.core.config import AppConfig
-from src.core.constants import CRS_FOR_DATA
-from src.io.local_storage import grab_files
-from src.io.raster_io import (
+from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.constants import CRS_FOR_DATA
+from clim4cast_imagegen.io.local_storage import grab_files
+from clim4cast_imagegen.io.raster_io import (
                                 read_and_clip_raster,
                                 load_data_from_mask_raster
                                 )
-from src.services.layout_engine import process_image
-from src.utils.pathname_utils import build_new_filename, extract_date
+from clim4cast_imagegen.services.layout_engine import process_image
+from clim4cast_imagegen.utils.pathname_utils import build_new_filename, extract_date
 
 
 def convert_coordinate_system_in_raster(

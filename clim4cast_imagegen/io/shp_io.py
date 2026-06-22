@@ -5,8 +5,8 @@ from pathlib import Path
 import geopandas as gpd
 from pyproj import CRS
 
-from src.core.config import AppConfig
-from src.core.constants import CRS_FOR_DATA
+from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.constants import CRS_FOR_DATA
 
 
 @dataclass

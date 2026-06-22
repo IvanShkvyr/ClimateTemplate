@@ -14,14 +14,14 @@ import rasterio
 from rasterio.plot import show
 from tqdm import tqdm
 
-from src.core.config import AppConfig
-from src.core.constants import PALETTES_V1, PALETTES_V2
-from src.io.shp_io import load_visual_shapefiles, VisualLayers
-from src.services.raster_processor import (
+from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.constants import PALETTES_V1, PALETTES_V2
+from clim4cast_imagegen.io.shp_io import load_visual_shapefiles, VisualLayers
+from clim4cast_imagegen.services.raster_processor import (
                                             rename_and_copy_images,
                                             reclassify_raster
                                             )
-from src.utils.palette_utils import PaletteConfig
+from clim4cast_imagegen.utils.palette_utils import PaletteConfig
 
 
 def create_visualization_countinuous_with_shapefiles(
