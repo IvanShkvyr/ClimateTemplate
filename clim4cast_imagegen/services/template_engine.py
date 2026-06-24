@@ -8,6 +8,7 @@ import os
 from clim4cast_imagegen.core.config import AppConfig
 from clim4cast_imagegen.services.layout_engine import combine_maps_with_layout
 from clim4cast_imagegen.utils.palette_utils import select_palette
+from clim4cast_imagegen.utils.pathname_utils import get_background_type
 
 
 def collect_templates(template_root: Path) -> dict:
@@ -83,13 +84,7 @@ def process_single_background(
     """
     logger = logging.getLogger("template_worker")
 
-    background_type = background.stem
-
-    # Adjust background type if it contains "AW"
-    if "AW" in background_type:
-        background_type = background_type[3:-2]
-    else:
-        background_type = background_type[3:]
+    background_type = get_background_type(background)
 
     try:
         img_list = lauout_map[background_type]

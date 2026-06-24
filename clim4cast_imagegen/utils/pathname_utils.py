@@ -19,7 +19,7 @@ def extract_date(path: Path, logger: logging.Logger) -> Optional[datetime]:
 
 def get_background_type(path: Path) -> str:
     """
-    TODO
+    Extract and normalize the background type from a file path.
     """
     background_type = path.stem
 

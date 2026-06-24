@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from clim4cast_imagegen.utils.pathname_utils import get_background_type, extract_date
+from clim4cast_imagegen.utils.pathname_utils import get_background_type, extract_date, normalize_dfm_single_part
 
 
 def combine_maps_with_layout(
@@ -102,7 +102,7 @@ def process_backgrounds(
     for background in list_of_background:
         date_labels = []
 
-        background_type = get_background_type(background)
+        background_type = normalize_dfm_single_part(get_background_type(background))
 
         try:
             img_list = list_for_background_layout[background_type]
@@ -115,13 +115,6 @@ def process_backgrounds(
         # Extract date labels from image filenames
         for img in img_list:
             formatted_date = extract_date(img)
-
-            # date = img.stem.split("_")[-1]
-
-            # formatted_date = datetime.strptime(
-            #                                     date, "%Y-%m-%d"
-            #                                     ).strftime("%d.%m.%Y")         TODO
-
 
             date_labels.append(formatted_date.strftime("%d.%m.%Y"))
         
