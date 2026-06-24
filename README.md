@@ -70,3 +70,6 @@ API_PASSWORD=your_password
 
 - The script is configured to work with data available at `//monospace/mendelu/`. Please ensure that you have access to this resource before using the script. Additionally, note that the data used by the script (as of today) may not yet be available on this resource.
 ```
+
+
+python -m clim4cast_imagegen

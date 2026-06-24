@@ -2,8 +2,7 @@
 
 from datetime import datetime
 from paramiko import SSHException
-from pathlib import Path
-import os
+from pathlib import Path, PurePosixPath
 
 import pysftp
 
@@ -113,23 +112,22 @@ def upload_directory_in_sftp(
         relative_path = local_path.relative_to(source)
 
         # Construct the remote path
-        remote_path = destination / relative_path
-        remote_path_str = str(remote_path).replace(os.sep, "/")
+        remote_path = PurePosixPath(destination) / relative_path
 
         if local_path.is_dir():
             # Create the corresponding directory on the server
             try:
-                sftp.makedirs(remote_path_str)
-                print(f"Directory created: {remote_path_str}")
+                sftp.makedirs(remote_path)
+                print(f"Directory created: {remote_path}")
             except OSError:
-                print(f"Directory already exists: {remote_path_str}")
+                print(f"Directory already exists: {remote_path}")
             except Exception as err:
-                print(f"Failed to create directory {remote_path_str}: {err}")
+                print(f"Failed to create directory {remote_path}: {err}")
         else:
             # Upload the file
             try:
-                sftp.put(str(local_path), remote_path_str)
-                print(f"Uploaded: {local_path} → {remote_path_str}")
+                sftp.put(str(local_path), remote_path)
+                print(f"Uploaded: {local_path} → {remote_path}")
             except SSHException as e:
                 print(f"SSH error while uploading {local_path}: {e}")
             except Exception as e:
@@ -210,7 +208,7 @@ def _remove_directory_in_sftp(
         None: This function does not return any value.
     """
     # Construct the full remote path
-    remote_path = f"{remote_root}/{dir_name}".replace('\\', '/')
+    remote_path = PurePosixPath(remote_root) / dir_name
     
     try:
         # Check if the directory exists
@@ -221,7 +219,7 @@ def _remove_directory_in_sftp(
         # Recursively delete files and subdirectories
         for entry in sftp_client.listdir_attr(remote_path):
             entry_name = entry.filename
-            full_remote_path = f"{remote_path}/{entry_name}".replace('\\', '/')
+            full_remote_path = PurePosixPath(remote_path) / entry_name
             
             if sftp_client.isdir(full_remote_path):
                 # Recursively delete subdirectories

@@ -172,9 +172,8 @@ def upload_files_to_api(
 
     for current_file in all_files:
 
-        relative_path = os.path.relpath(
-            current_file, root_folder
-            ).replace("\\", "/")
+        relative_path = current_file.relative_to(root_folder).as_posix()
+
         url = f"{base_url.rstrip('/')}/upload/{relative_path}"
 
         try:

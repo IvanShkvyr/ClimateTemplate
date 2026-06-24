@@ -1,7 +1,7 @@
 """LEGACY"""
 
 from ftplib import FTP, error_perm, all_errors
-import os
+from pathlib import Path
 
 
 def connect_to_ftp(host: str, username: str, password: str) -> FTP:
@@ -67,17 +67,16 @@ def upload_files_to_ftp(
             return uploaded_files
 
     # Iterate through files in the local directory and upload them
-    for filename in os.listdir(local_folder):
-        local_path = os.path.join(local_folder, filename)
+    for local_path in list(Path(local_folder).iterdir()):
 
-        if os.path.isfile(local_path):
+        if local_path.is_file():
             try:
                 with open(local_path, 'rb') as file:
-                    ftp_connection.storbinary(f'STOR {filename}', file)
-                uploaded_files.append(filename)
-                print(f"Uploaded {filename} → {remote_folder}")
+                    ftp_connection.storbinary(f'STOR {local_path}', file)
+                uploaded_files.append(local_path)
+                print(f"Uploaded {local_path} → {remote_folder}")
             except Exception as e:
-                print(f"Upload failed for {filename}: {e}")
+                print(f"Upload failed for {local_path}: {e}")
 
     return uploaded_files
 
