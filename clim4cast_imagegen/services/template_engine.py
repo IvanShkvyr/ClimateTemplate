@@ -3,29 +3,12 @@ from datetime import datetime
 import logging
 from multiprocessing import cpu_count
 from pathlib import Path
-import os
 
 from clim4cast_imagegen.core.config import AppConfig
 from clim4cast_imagegen.services.layout_engine import combine_maps_with_layout
 from clim4cast_imagegen.utils.palette_utils import select_palette
 from clim4cast_imagegen.utils.pathname_utils import get_background_type
-
-
-def collect_templates(template_root: Path) -> dict:
-    """
-    Collect all template PNG files grouped by target folder.
-    """
-    templates = {}
-
-    for root, _, files in os.walk(template_root):
-        pngs = [Path(root) / f for f in files if f.endswith(".png")]
-
-        if pngs:
-            relative_path = Path(root).relative_to(template_root)
-            target_dir = Path(relative_path)
-            templates[target_dir] = pngs
-    
-    return templates
+from clim4cast_imagegen.io.local_storage import find_png_files_grouped_by_dir, ensure_dir
 
 
 def generate_templates(
@@ -37,7 +20,7 @@ def generate_templates(
     Paralel template generation.
     """
 
-    templates = collect_templates(
+    templates = find_png_files_grouped_by_dir(
         config.templates_path,
         )
     max_workers = min(cpu_count() - 1 if cpu_count() > 1 else 1, 8)
@@ -46,7 +29,8 @@ def generate_templates(
 
     for relative_dir, backgrounds in templates.items():
         target_dir = config.folders.temp_downloads / relative_dir
-        target_dir.mkdir(parents=True, exist_ok=True)
+
+        ensure_dir(target_dir)
 
         layout = select_palette(relative_dir, visualizations)
 

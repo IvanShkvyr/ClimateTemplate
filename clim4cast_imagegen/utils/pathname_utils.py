@@ -29,7 +29,7 @@ def get_background_type(path: Path) -> str:
     else:
         background_type = background_type[3:]
 
-    return normalize_dfm_single_part(background_type)
+    return background_type
 
 
 def normalize_dfm_single_part(part: str) -> str:
