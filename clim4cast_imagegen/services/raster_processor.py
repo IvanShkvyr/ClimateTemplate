@@ -1,10 +1,6 @@
 import logging
 from pathlib import Path
 
-import numpy as np
-from pyproj import CRS
-import rasterio
-from rasterio.warp import reproject, Resampling, calculate_default_transform
 from tqdm import tqdm
 
 from clim4cast_imagegen.core.config import AppConfig
@@ -12,63 +8,13 @@ from clim4cast_imagegen.core.constants import CRS_FOR_DATA
 from clim4cast_imagegen.io.local_storage import grab_files
 from clim4cast_imagegen.io.raster_io import (
                                 read_and_clip_raster,
-                                load_data_from_mask_raster
+                                load_data_from_mask_raster,
+                                convert_coordinate_system_in_raster
                                 )
 from clim4cast_imagegen.services.layout_engine import process_image
 from clim4cast_imagegen.utils.pathname_utils import build_new_filename, extract_date
 
 
-def convert_coordinate_system_in_raster(
-                                        target_crs: CRS,
-                                        input_path: Path,
-                                        output_path: Path
-                                        ) -> None:
-    """
-    Converts the coordinate system of the input raster to the specified CRS 
-    and saves the reprojected raster to the given output path.
-
-    Args:
-        crs_mercator (CRS): The target coordinate reference system (CRS) to
-            which the raster should be converted. Typically, this would be the
-            Web Mercator projection (EPSG:3857).
-        input_path (str): The file path of the input raster that needs to be
-            reprojected.
-        output_path (str): The file path where the reprojected raster will
-            be saved.
-
-    Returns:
-        None: The function performs the reprojecting and saves the resulting
-            raster to the specified output path.
-    """
-    # Open the source raster to check its CRS and other properties
-    with rasterio.open(input_path) as src:
-
-        # Check if the CRS of the raster is different from the target CRS
-        if src.crs != target_crs:
-            # Calculate the transformation needed to convert the current CRS
-            # to target CRS
-            transform, width, height = calculate_default_transform(
-                src.crs, target_crs, src.width, src.height, *src.bounds
-            )
-            nodata_value = src.nodata
-
-            # Open a new raster file for saving the reprojected data
-            with rasterio.open(output_path, "w", driver="GTiff",
-                            count=1, dtype=src.dtypes[0],
-                            crs=target_crs, transform=transform,
-                            width=width, height=height,
-                            nodata=nodata_value) as dst:
-                
-                # Reproject the data from the source CRS to the target CRS
-                reproject(
-                    source=rasterio.band(src, 1),
-                    destination=rasterio.band(dst, 1),
-                    src_transform=src.transform,
-                    src_crs=src.crs,
-                    dst_transform=transform,
-                    dst_crs=target_crs,
-                    resampling=Resampling.nearest
-                )
 
 
 def generate_base_raster(
@@ -146,51 +92,6 @@ def process_rasters(
         list_of_img.append(output_path_2)
 
     return list_of_img
-
-
-def reclassify_raster(
-                    raster_path: Path, 
-                    output_raster_path: Path, 
-                    boundaries: list[float]
-                    ) -> Path:
-    """
-    Reclassifies a raster based on specified boundaries and saves the output.
-
-    This function reads an input raster, reclassifies its pixel values into 
-    new classes based on the provided boundaries, and writes the reclassified
-    raster to the specified output path. The new raster will have integer class
-    values.
-
-    Args:
-        raster_path (Path): The path to the input raster file.
-        output_raster_path (Path): The directory where the output raster file
-            will be saved.
-        boundaries (List[float]): A list of boundary values to define the
-            reclassification bins.
-
-    Returns:
-        Path: The path to the saved reclassified raster file.
-    """
-    # Load the raster file
-    with rasterio.open(raster_path) as src:
-        raster_data = src.read(1)
-        profile = src.profile
-        # Default to -999 if NoData is not defined
-        nodata_value = src.nodata if src.nodata is not None else -999.0
-    
-    # Reclassify the raster data based on the provided boundaries
-    classes = np.digitize(raster_data, bins=boundaries, right=True) - 1
-    
-    final_path = Path(output_raster_path) / Path(raster_path).name
-
-    # Update the profile with new data type and NoData value
-    profile.update(dtype=rasterio.int16, count=1, nodata=nodata_value)
-
-    # Write the reclassified raster to the output path
-    with rasterio.open(final_path, 'w', **profile) as dst:
-        dst.write(classes.astype(rasterio.int16), 1)
-
-    return final_path
 
 
 def rename_and_copy_images(

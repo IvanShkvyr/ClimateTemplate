@@ -1,7 +1,8 @@
 from dataclasses import asdict
-from datetime import date, timedelta
+from datetime import date
 import logging
 from pathlib import Path
+import os
 import shutil
 from typing import Iterable
 import time
@@ -119,3 +120,18 @@ def wait_for_input_data(
         time.sleep(retry_interval)
 
     return path_to_data
+
+
+def find_png_files_grouped_by_dir(root: Path) -> dict[Path, list[Path]]:
+    """Walk a directory tree and group PNG files by their relative folder."""
+    grouped: dict[Path, list[Path]] = {}
+    for current_dir, _, files in os.walk(root):
+        pngs = [Path(current_dir) / f for f in files if f.endswith(".png")]
+        if pngs:
+            relative_path = Path(current_dir).relative_to(root)
+            grouped[relative_path] = pngs
+    return grouped
+
+
+def ensure_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)

@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use("Agg")
+
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import logging
@@ -17,10 +20,11 @@ from tqdm import tqdm
 from clim4cast_imagegen.core.config import AppConfig
 from clim4cast_imagegen.core.constants import PALETTES_V1, PALETTES_V2
 from clim4cast_imagegen.io.shp_io import load_visual_shapefiles, VisualLayers
+from clim4cast_imagegen.io.raster_io import reclassify_raster, read_raster_for_visualization
 from clim4cast_imagegen.services.raster_processor import (
                                             rename_and_copy_images,
-                                            reclassify_raster
                                             )
+
 from clim4cast_imagegen.utils.palette_utils import PaletteConfig
 
 
@@ -60,11 +64,7 @@ def create_visualization_countinuous_with_shapefiles(
         None: The function saves the resulting plot to the specified
             `final_path` as a PNG image.
     """
-    # Read the raster file
-    with rasterio.open(raster_file) as src:
-        raster_data = src.read(1)
-        transform = src.transform
-        nodata_value = src.nodata
+    raster_data, transform, nodata_value, width, height = read_raster_for_visualization(raster_file)
 
     # Create a mask for NoData values and -999 values
     mask = (raster_data == -999)
@@ -106,8 +106,8 @@ def create_visualization_countinuous_with_shapefiles(
     fig, ax = plt.subplots(figsize=(21, 21), dpi=300)
 
     # Set the extent of the plot based on the raster transform
-    ax.set_xlim([transform[2], transform[2] + src.width * transform[0]])
-    ax.set_ylim([transform[5] + src.height * transform[4], transform[5]])
+    ax.set_xlim([transform[2], transform[2] + width * transform[0]])
+    ax.set_ylim([transform[5] + height * transform[4], transform[5]])
 
     # Show the raster data with the colormap and normalization
     show(masked_data, ax=ax, cmap=cmap, norm=norm, transform=transform)
