@@ -13,10 +13,8 @@ dependencies = [
     "geopandas",
     "matplotlib",
     "numpy",
-    "paramiko",
     "pillow",
     "pyproj",
-    "pysftp",
     "python-dotenv",
     "pyyaml",
     "rasterio",
@@ -29,3 +27,9 @@ include = ["clim4cast_imagegen*"]
 
 [project.scripts]
 clim4cast-imagegen = "clim4cast_imagegen.cli:run"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
