@@ -18,7 +18,7 @@ from rasterio.plot import show
 from tqdm import tqdm
 
 from clim4cast_imagegen.core.config import AppConfig
-from clim4cast_imagegen.core.constants import PALETTES_V1, PALETTES_V2
+from clim4cast_imagegen.core.palette_types import PALETTE_REGISTRY_V1, PALETTE_REGISTRY_V2
 from clim4cast_imagegen.io.shp_io import load_visual_shapefiles, VisualLayers
 from clim4cast_imagegen.io.raster_io import reclassify_raster, read_raster_for_visualization
 from clim4cast_imagegen.services.raster_processor import (
@@ -209,13 +209,13 @@ def generate_visualizations(
     palette_configs = [
         PaletteConfig(
             name="normal",
-            palettes=PALETTES_V1,
+            palettes=PALETTE_REGISTRY_V1,
             temp_dir=config.folders.temp_img_v1,
             final_dir=config.folders.temp_final_v1,
         ),
         PaletteConfig(
             name="reduced",
-            palettes=PALETTES_V2,
+            palettes=PALETTE_REGISTRY_V2,
             temp_dir=config.folders.temp_img_v2,
             final_dir=config.folders.temp_final_v2,
         ),
@@ -255,14 +255,12 @@ def process_single_raster(
 
     # Load the palette and boundaries for the given raster type
     palette = palettes[raster_type]
+    boundaries = palette.boundaries
+    colors = palette.colors
+    classes = palette.classes
+    continuous = palette.continuous_coloring
 
-    boundaries = palette["boundaries"]
-    colors = palette["colors"]
-    classes = palette["classes"]
-    continuous = palette["continuous_coloring"]
-
-    # If raster type is not "AWP" or "FWI", reclassify it
-    if raster_type not in ["AWP", "FWI"]:
+    if palette.reclassify:
         raster_path = reclassify_raster(raster_path, work_folder, boundaries)
 
     img_path = Path(work_folder) / Path(raster_path).name
