@@ -1,7 +1,6 @@
-import logging
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 
 def open_rgba(path: Path) -> Image.Image:

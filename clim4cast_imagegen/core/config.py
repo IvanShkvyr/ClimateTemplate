@@ -38,16 +38,6 @@ REQUIRED_FILE_KEYS = [
     "font_path"
     ]
 
-REQUIRED_FILES = [
-        "countries",
-        "central_countries",
-        "sea",
-        "source_path",
-        "templates_path",
-        "frame_raster",
-        "font_path",
-    ]
-
 
 @dataclass
 class FolderPaths:
@@ -172,22 +162,19 @@ def _validate_paths_exist(config: AppConfig) -> None:
     """
     Validate that all required files and resources exist on disk.
     """
-    missing_files = []
-    for file_atr in REQUIRED_FILES:
-
-        if file_atr in ["countries", "central_countries", "sea"]:
-            current_shp = getattr(config, "shapes")
-            current_path = getattr(current_shp, file_atr)
-        else:
-            current_path = getattr(config, file_atr)
-
-        if not current_path.exists():
-            missing_files.append(current_path)
-    
+    paths_to_check = {
+        "countries": config.shapes.countries,
+        "central_countries": config.shapes.central_countries,
+        "sea": config.shapes.sea,
+        "source_path": config.source_path,
+        "templates_path": config.templates_path,
+        "frame_raster": config.frame_raster,
+        "font_path": config.font_path,
+    }
+    missing_files = [path for path in paths_to_check.values() if not path.exists()]
     if missing_files:
         raise ValueError(
-            f"Missing required files: "
-            f"{', '.join(list(str(missing_file) for missing_file in missing_files))}"
+            f"Missing required files: {', '.join(str(mf) for mf in missing_files)}"
         )
 
 

@@ -20,6 +20,7 @@ async def main() -> None:
 
     logger = setup_logger()
     logger.info(f"--------- Pipeline Execution Started --------")
+    config = None
 
     try:
         config = load_app_config()
@@ -55,7 +56,6 @@ async def main() -> None:
 
     finally:
         if config: 
-
             # cleanup(config, logger)                                           # TODO   
             logger.info(f"Temporary directories cleaned up.")   
 

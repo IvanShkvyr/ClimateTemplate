@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from clim4cast_imagegen.core.config import AppConfig
 from clim4cast_imagegen.core.constants import CRS_FOR_DATA
-from clim4cast_imagegen.io.local_storage import grab_files
+from clim4cast_imagegen.io.local_storage import grab_files, ensure_dir
 from clim4cast_imagegen.io.raster_io import (
                                 read_and_clip_raster,
                                 load_data_from_mask_raster,
@@ -104,7 +104,7 @@ def rename_and_copy_images(
     """
 
     dst_root = Path(dst_root)
-    dst_root.mkdir(parents=True, exist_ok=True)
+    ensure_dir(dst_root)
 
     for paths in files_map.values():
         path_objs = [Path(p) for p in paths]
