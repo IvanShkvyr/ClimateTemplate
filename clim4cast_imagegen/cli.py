@@ -7,7 +7,7 @@ from clim4cast_imagegen.io.local_storage import (
                                     prepare_environment,
                                     cleanup
                                     )
-from clim4cast_imagegen.io.transport.api import upload_results_async
+from clim4cast_imagegen.io.api import upload_results_async
 from clim4cast_imagegen.services.raster_processor import generate_base_raster
 from clim4cast_imagegen.services.visualizer import generate_visualizations
 from clim4cast_imagegen.services.template_engine import generate_templates

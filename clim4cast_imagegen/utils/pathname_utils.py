@@ -51,7 +51,6 @@ def normalize_dfm_name_parts(parts: list[str]) -> list[str]:
     Example:
         DFM100 -> DFM_100
     """
-
     return [normalize_dfm_single_part(p) for p in parts]
 
 
@@ -61,4 +60,7 @@ def build_new_filename(path: Path, index: int) -> str:
     """
     name_parts = path.stem.split("_")[:-1]
     name_parts = normalize_dfm_name_parts(name_parts)
-    return "_".join(name_parts) + f"_{index}.png"
+
+    result = "_".join(name_parts) + f"_{index}.png"
+
+    return result
