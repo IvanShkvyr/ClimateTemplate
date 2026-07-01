@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 
-def extract_date(path: Path, logger: logging.Logger) -> Optional[datetime]:
+def extract_date(path: Path, logger: logging.Logger) -> datetime:
     """
     Extract a date from the file name
     """
