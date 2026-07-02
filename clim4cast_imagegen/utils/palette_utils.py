@@ -24,7 +24,3 @@ def select_palette(
         raise ValueError(f"Unknown palette folder: {parent_name}")
 
     return visualizations[parent_name]
-
-
-
-
