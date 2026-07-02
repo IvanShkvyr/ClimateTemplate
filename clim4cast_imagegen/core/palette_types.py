@@ -17,6 +17,7 @@ def _build_palette_registry(
         raw_palettes: Dict, no_reclassify: set[str]
     ) -> Dict[str, RasterPalette]:
     """
+    Build a registry of RasterPalette objects from raw palette specs.
     """
     return {
         raster_type: RasterPalette(
