@@ -4,15 +4,9 @@ import aiohttp
 import asyncio
 import logging
 from pathlib import Path
-import requests
 import os
 
 from clim4cast_imagegen.core.config import AppConfig
-
-
-RED = "\033[91m"
-GREEN = "\033[92m"
-RESET = "\033[0m"
 
 
 async def upload_results_async(
@@ -92,7 +86,7 @@ async def upload_files_to_api_async(
 
         for file_path, result in zip(all_files, results):
             if isinstance(result, Exception):
-                logger.error(f"{RED}EXCEPTION {file_path}: {result}{RESET}")
+                logger.error(f"EXCEPTION {file_path}: {result}")
             elif result:
                 uploaded.append(file_path)
     
@@ -118,97 +112,21 @@ async def upload_single_file(
         try:
             async with session.post(url, data=file_path.read_bytes()) as response:
                 if response.status == 200:
-                    logger.info(f"{GREEN}OK status_code 200 {url}{RESET}")
+                    logger.info(f"OK status_code 200 {url}")
                     return True
                 else:
                     text = await response.text()
                     logger.error(
-                        f"{RED}{file_path} -> {response.status}: {text}{RESET}"
+                        f"{file_path} -> {response.status}: {text}"
                         )
                     return False
                 
         except asyncio.TimeoutError:
-            logger.error(f"{RED}TIMEOUT {file_path}{RESET}")
+            logger.error(f"TIMEOUT {file_path}")
             return False
         except aiohttp.ClientError as err:
-            logger.error(f"{RED}CLIENT ERROR {file_path}: {err}{RESET}")
+            logger.error(f"CLIENT ERROR {file_path}: {err}")
             return False
         except Exception as err:
-            logger.error(f"{RED}EXCEPTION {file_path}: {err}{RESET}")
+            logger.error(f"EXCEPTION {file_path}: {err}")
             return False
-
-
-def upload_files_to_api(
-                        base_url: str,
-                        username: str,
-                        password: str,
-                        root_folder: str,
-                        logger: logging.Logger,
-                        ) -> list:
-    """
-    Recursively uploads all files from 'final/' tree to Clim4Cast API.
-
-    Example valid paths:
-        final/downloads/normal/CZ/AWP_0-40cm_0.png
-        final/layers/reduced/UTCI_3.png
-
-    Args:
-        base_url (str): Base API endpoint
-        username (str): Username for Basic Auth
-        password (str): Password for Basic Auth
-        root_folder (str): Local root directory containing all files to upload
-
-    Returns:
-        list: A list of full local file paths that were successfully uploaded
-    """
-    uploaded = []
-
-    if not os.path.isdir(root_folder):
-        logger.error(f" Root folder does not exist: {root_folder}")
-        return uploaded
-    
-    root_folder = Path(root_folder)
-    all_files = list(root_folder.rglob("*.*")) 
-
-    for current_file in all_files:
-
-        relative_path = current_file.relative_to(root_folder).as_posix()
-
-        url = f"{base_url.rstrip('/')}/upload/{relative_path}"
-
-        try:
-            with open(current_file, "rb") as f:
-                res = requests.post(
-                                    url,
-                                    data=f,
-                                    auth=(username, password),
-                                    verify=False
-                                    )
-
-            if res.status_code == 200:
-                logger.info(f"{GREEN} OK status_code 200 {url}{RESET}")
-                uploaded.append(current_file)
-            else:
-                logger.error(f"{current_file} → {res.status_code}: {res.text}")
-
-        except Exception as e:
-            logger.error(f" EXCEPTION {current_file}: {e}")
-
-    return uploaded
-
-
-def upload_results(
-        config: dict, directories: dict, logger: logging.Logger
-        ) -> None:
-    """
-    Orchestrates upload of generated images via API
-    """
-    logger.info(f"Start uploading a final folder")
-    uploaded = upload_files_to_api(
-                        base_url=config["clim4cast"]["base_url"],
-                        username=config["clim4cast"]["username"],
-                        password=config["clim4cast"]["password"],
-                        root_folder=directories["folder_to_send"],
-                        logger=logger,
-                        )
-    logger.info(f"Upload finished. Uploaded {len(uploaded)} files via API")
