@@ -76,6 +76,7 @@ class AppConfig:
     templates_path: Path
     frame_raster: Path
     font_path: Path
+    dry_run: bool = True
 
 
 def _require_keys(d: Dict, section_name: str, keys: List[str]) -> None:
@@ -124,6 +125,8 @@ def _build_app_config(cfg: Dict) -> AppConfig:
 
     username = os.getenv("API_USERNAME")
     password = os.getenv("API_PASSWORD", "")
+    raw = os.getenv("CLIM4CAST_DRY_RUN", "true").strip().lower()
+    dry_run = raw not in ("false", "0", "no")
 
     if not username:
         raise ValueError("Critical error: API_USERNAME not found in .env file!")
@@ -154,7 +157,8 @@ def _build_app_config(cfg: Dict) -> AppConfig:
         source_path=Path(cfg["path_to_source"]),
         templates_path=PROJECT_ROOT / Path(cfg["path_to_tamplates"]),
         frame_raster=PROJECT_ROOT / Path(cfg["frame_to_raster"]),
-        font_path=PROJECT_ROOT / Path(cfg["font_path"])
+        font_path=PROJECT_ROOT / Path(cfg["font_path"]),
+        dry_run=dry_run
     )
 
 
