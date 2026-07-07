@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 from clim4cast_imagegen.core.config import load_app_config
 from clim4cast_imagegen.core.logging_conf import setup_logger
@@ -61,7 +62,7 @@ async def main() -> None:
 
     except Exception as exc:
         logger.exception(f"Pipeline failed: {exc}")
-
+        raise
     finally:
         if config: 
             # cleanup(config, logger)                                           # TODO   
@@ -71,4 +72,7 @@ async def main() -> None:
 
 def run() -> None:
     """Synchronous entry point: runs the async pipeline once."""
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception:
+        sys.exit(1)
