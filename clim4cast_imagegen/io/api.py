@@ -2,17 +2,25 @@
 
 import aiohttp
 import asyncio
+from dataclasses import dataclass
 import logging
 from pathlib import Path
-import requests
 import os
+from typing import List
 
 from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.exceptions import UploadIncompleteError
 
 
-RED = "\033[91m"
-GREEN = "\033[92m"
-RESET = "\033[0m"
+@dataclass(frozen=True)
+class UploadReport:
+    uploaded: List
+    failed: List
+
+    @property
+    def total(self) -> int:
+        return len(self.uploaded) + len(self.failed)
+
 
 
 async def upload_results_async(
@@ -23,14 +31,17 @@ async def upload_results_async(
     """
 
     logger.info(f"Start uploading a final folder")
-    uploaded = await upload_files_to_api_async(
+    report = await upload_files_to_api_async(
                         base_url=config.api.base_url,
                         username=config.api.username,
                         password=config.api.password,
                         root_folder=config.folders.to_send,
                         logger=logger,
                         )
-    logger.info(f"Upload finished. Uploaded {len(uploaded)} files via API")
+    logger.info(f"Delivered {len(report.uploaded)}/{report.total} files via API")
+
+    if report.failed:
+        raise UploadIncompleteError(report.failed)
 
 
 async def upload_files_to_api_async(
@@ -40,7 +51,7 @@ async def upload_files_to_api_async(
                         root_folder: str,
                         logger: logging.Logger,
                         max_concurrent: int = 10,
-                        ) -> list:
+                        ) -> UploadReport:
     """
     Recursively uploads all files from 'final/' tree to Clim4Cast API.
 
@@ -48,14 +59,12 @@ async def upload_files_to_api_async(
         final/downloads/normal/CZ/AWP_0-40cm_0.png
         final/layers/reduced/UTCI_3.png
     """
-    uploaded = []
-
     if not os.path.isdir(root_folder):
         logger.error(f" Root folder does not exist: {root_folder}")
-        return uploaded
-    
+        return UploadReport(uploaded=[], failed=[])
+
     root_folder = Path(root_folder)
-    
+
     all_files = list(root_folder.rglob("*.*")) 
 
     auth = aiohttp.BasicAuth(username, password)
@@ -75,7 +84,7 @@ async def upload_files_to_api_async(
         timeout=timeout,
         auth=auth,
     ) as session:
-        
+
         tasks = [
             upload_single_file(
                 session=session,
@@ -90,13 +99,17 @@ async def upload_files_to_api_async(
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
+        uploaded, failed = [], []
+
         for file_path, result in zip(all_files, results):
-            if isinstance(result, Exception):
-                logger.error(f"{RED}EXCEPTION {file_path}: {result}{RESET}")
-            elif result:
+            if result is True:
                 uploaded.append(file_path)
-    
-    return uploaded
+            else:
+                failed.append(file_path)
+                if isinstance(result, Exception):
+                    logger.error(f"EXCEPTION {file_path}: {result}")
+
+    return UploadReport(uploaded=uploaded, failed=failed)
 
 
 async def upload_single_file(
@@ -106,6 +119,8 @@ async def upload_single_file(
         base_url: str,
         logger: logging.Logger,
         semaphore: asyncio.Semaphore,
+        max_attempts: int = 3,
+        base_delay: float = 1.0,
 ) -> bool:
     """
     Uploads a single file to the API
@@ -115,100 +130,35 @@ async def upload_single_file(
         relative_path = file_path.relative_to(root_path).as_posix()
         url = f"{base_url.rstrip('/')}/upload/{relative_path}"
 
-        try:
-            async with session.post(url, data=file_path.read_bytes()) as response:
-                if response.status == 200:
-                    logger.info(f"{GREEN}OK status_code 200 {url}{RESET}")
-                    return True
-                else:
-                    text = await response.text()
-                    logger.error(
-                        f"{RED}{file_path} -> {response.status}: {text}{RESET}"
-                        )
-                    return False
-                
-        except asyncio.TimeoutError:
-            logger.error(f"{RED}TIMEOUT {file_path}{RESET}")
-            return False
-        except aiohttp.ClientError as err:
-            logger.error(f"{RED}CLIENT ERROR {file_path}: {err}{RESET}")
-            return False
-        except Exception as err:
-            logger.error(f"{RED}EXCEPTION {file_path}: {err}{RESET}")
-            return False
 
+        for attempt in range(1, max_attempts + 1):
+            if attempt > 1:
+                await asyncio.sleep(base_delay * 2 ** (attempt - 1))
 
-def upload_files_to_api(
-                        base_url: str,
-                        username: str,
-                        password: str,
-                        root_folder: str,
-                        logger: logging.Logger,
-                        ) -> list:
-    """
-    Recursively uploads all files from 'final/' tree to Clim4Cast API.
+            try:
+                async with session.post(url, data=file_path.read_bytes()) as response:
+                    if response.status == 200:
+                        logger.info(f"OK status_code 200 {url}")
+                        return True
+                    elif 400 <= response.status < 500:
+                        text = await response.text()
+                        logger.error(
+                            f"{file_path} -> {response.status}: {text} "
+                            )
+                        return False
+                    elif response.status >= 500:
+                        text = await response.text()
+                        logger.warning(
+                            f"{file_path} -> {response.status}: {text}, "
+                            f"{attempt}/{max_attempts}"
+                            )
 
-    Example valid paths:
-        final/downloads/normal/CZ/AWP_0-40cm_0.png
-        final/layers/reduced/UTCI_3.png
+            except (asyncio.TimeoutError, aiohttp.ClientError) as err:
+                logger.warning(f"{file_path} {err}, {attempt}/{max_attempts}")
 
-    Args:
-        base_url (str): Base API endpoint
-        username (str): Username for Basic Auth
-        password (str): Password for Basic Auth
-        root_folder (str): Local root directory containing all files to upload
+            except Exception as err:
+                logger.error(f"EXCEPTION {file_path}: {err}")
+                return False
 
-    Returns:
-        list: A list of full local file paths that were successfully uploaded
-    """
-    uploaded = []
-
-    if not os.path.isdir(root_folder):
-        logger.error(f" Root folder does not exist: {root_folder}")
-        return uploaded
-    
-    root_folder = Path(root_folder)
-    all_files = list(root_folder.rglob("*.*")) 
-
-    for current_file in all_files:
-
-        relative_path = current_file.relative_to(root_folder).as_posix()
-
-        url = f"{base_url.rstrip('/')}/upload/{relative_path}"
-
-        try:
-            with open(current_file, "rb") as f:
-                res = requests.post(
-                                    url,
-                                    data=f,
-                                    auth=(username, password),
-                                    verify=False
-                                    )
-
-            if res.status_code == 200:
-                logger.info(f"{GREEN} OK status_code 200 {url}{RESET}")
-                uploaded.append(current_file)
-            else:
-                logger.error(f"{current_file} → {res.status_code}: {res.text}")
-
-        except Exception as e:
-            logger.error(f" EXCEPTION {current_file}: {e}")
-
-    return uploaded
-
-
-def upload_results(
-        config: dict, directories: dict, logger: logging.Logger
-        ) -> None:
-    """
-    Orchestrates upload of generated images via API
-    """
-    logger.info(f"Start uploading a final folder")
-    uploaded = upload_files_to_api(
-                        base_url=config["clim4cast"]["base_url"],
-                        username=config["clim4cast"]["username"],
-                        password=config["clim4cast"]["password"],
-                        root_folder=directories["folder_to_send"],
-                        logger=logger,
-                        )
-    logger.info(f"Upload finished. Uploaded {len(uploaded)} files via API")
+        logger.error(f"failed after {max_attempts} attempts: {file_path}")
+        return False
