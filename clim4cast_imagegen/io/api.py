@@ -2,11 +2,25 @@
 
 import aiohttp
 import asyncio
+from dataclasses import dataclass
 import logging
 from pathlib import Path
 import os
+from typing import List
 
 from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.exceptions import UploadIncompleteError
+
+
+@dataclass(frozen=True)
+class UploadReport:
+    uploaded: List
+    failed: List
+
+    @property
+    def total(self) -> int:
+        return len(self.uploaded) + len(self.failed)
+
 
 
 async def upload_results_async(
@@ -17,14 +31,17 @@ async def upload_results_async(
     """
 
     logger.info(f"Start uploading a final folder")
-    uploaded = await upload_files_to_api_async(
+    report = await upload_files_to_api_async(
                         base_url=config.api.base_url,
                         username=config.api.username,
                         password=config.api.password,
                         root_folder=config.folders.to_send,
                         logger=logger,
                         )
-    logger.info(f"Upload finished. Uploaded {len(uploaded)} files via API")
+    logger.info(f"Delivered {len(report.uploaded)}/{report.total} files via API")
+
+    if report.failed:
+        raise UploadIncompleteError(report.failed)
 
 
 async def upload_files_to_api_async(
@@ -34,7 +51,7 @@ async def upload_files_to_api_async(
                         root_folder: str,
                         logger: logging.Logger,
                         max_concurrent: int = 10,
-                        ) -> list:
+                        ) -> UploadReport:
     """
     Recursively uploads all files from 'final/' tree to Clim4Cast API.
 
@@ -42,14 +59,12 @@ async def upload_files_to_api_async(
         final/downloads/normal/CZ/AWP_0-40cm_0.png
         final/layers/reduced/UTCI_3.png
     """
-    uploaded = []
-
     if not os.path.isdir(root_folder):
         logger.error(f" Root folder does not exist: {root_folder}")
-        return uploaded
-    
+        return UploadReport(uploaded=[], failed=[])
+
     root_folder = Path(root_folder)
-    
+
     all_files = list(root_folder.rglob("*.*")) 
 
     auth = aiohttp.BasicAuth(username, password)
@@ -69,7 +84,7 @@ async def upload_files_to_api_async(
         timeout=timeout,
         auth=auth,
     ) as session:
-        
+
         tasks = [
             upload_single_file(
                 session=session,
@@ -84,13 +99,17 @@ async def upload_files_to_api_async(
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
+        uploaded, failed = [], []
+
         for file_path, result in zip(all_files, results):
-            if isinstance(result, Exception):
-                logger.error(f"EXCEPTION {file_path}: {result}")
-            elif result:
+            if result is True:
                 uploaded.append(file_path)
-    
-    return uploaded
+            else:
+                failed.append(file_path)
+                if isinstance(result, Exception):
+                    logger.error(f"EXCEPTION {file_path}: {result}")
+
+    return UploadReport(uploaded=uploaded, failed=failed)
 
 
 async def upload_single_file(
