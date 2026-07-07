@@ -100,6 +100,8 @@ async def upload_single_file(
         base_url: str,
         logger: logging.Logger,
         semaphore: asyncio.Semaphore,
+        max_attempts: int = 3,
+        base_delay: float = 1.0,
 ) -> bool:
     """
     Uploads a single file to the API
@@ -109,24 +111,35 @@ async def upload_single_file(
         relative_path = file_path.relative_to(root_path).as_posix()
         url = f"{base_url.rstrip('/')}/upload/{relative_path}"
 
-        try:
-            async with session.post(url, data=file_path.read_bytes()) as response:
-                if response.status == 200:
-                    logger.info(f"OK status_code 200 {url}")
-                    return True
-                else:
-                    text = await response.text()
-                    logger.error(
-                        f"{file_path} -> {response.status}: {text}"
-                        )
-                    return False
-                
-        except asyncio.TimeoutError:
-            logger.error(f"TIMEOUT {file_path}")
-            return False
-        except aiohttp.ClientError as err:
-            logger.error(f"CLIENT ERROR {file_path}: {err}")
-            return False
-        except Exception as err:
-            logger.error(f"EXCEPTION {file_path}: {err}")
-            return False
+
+        for attempt in range(1, max_attempts + 1):
+            if attempt > 1:
+                await asyncio.sleep(base_delay * 2 ** (attempt - 1))
+
+            try:
+                async with session.post(url, data=file_path.read_bytes()) as response:
+                    if response.status == 200:
+                        logger.info(f"OK status_code 200 {url}")
+                        return True
+                    elif 400 <= response.status < 500:
+                        text = await response.text()
+                        logger.error(
+                            f"{file_path} -> {response.status}: {text} "
+                            )
+                        return False
+                    elif response.status >= 500:
+                        text = await response.text()
+                        logger.warning(
+                            f"{file_path} -> {response.status}: {text}, "
+                            f"{attempt}/{max_attempts}"
+                            )
+
+            except (asyncio.TimeoutError, aiohttp.ClientError) as err:
+                logger.warning(f"{file_path} {err}, {attempt}/{max_attempts}")
+
+            except Exception as err:
+                logger.error(f"EXCEPTION {file_path}: {err}")
+                return False
+
+        logger.error(f"failed after {max_attempts} attempts: {file_path}")
+        return False
