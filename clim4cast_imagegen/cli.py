@@ -23,7 +23,7 @@ async def main() -> None:
     """
 
     logger = setup_logger()
-    logger.info(f"--------- Pipeline Execution Started --------")
+    logger.info("Pipeline Execution Started")
     config = None
 
     try:
@@ -78,7 +78,7 @@ async def main() -> None:
         raise
 
     finally:
-        logger.info(f"--------- Pipeline Execution Finished --------")
+        logger.info("Pipeline Execution Finished")
 
 def run() -> None:
     """Synchronous entry point: runs the async pipeline once."""
