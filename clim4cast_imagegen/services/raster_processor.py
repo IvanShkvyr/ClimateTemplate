@@ -110,7 +110,7 @@ def rename_and_copy_images(
         path_objs = [Path(p) for p in paths]
         sorted_paths = sorted(
             path_objs,
-            key=lambda p: extract_date(p, logger)
+            key=extract_date
         )
 
         # Copy with new names
