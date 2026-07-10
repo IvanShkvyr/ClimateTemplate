@@ -10,8 +10,8 @@ from clim4cast_imagegen.utils.pathname_utils import (
     normalize_dfm_single_part,
     normalize_dfm_name_parts,
     build_new_filename,
-
 )
+from clim4cast_imagegen.core.exceptions import InvalidRasterDateError
 
 
 EXTRACT_DATE_EXAMPLES = [
@@ -69,31 +69,20 @@ BUILD_NEW_FILENAME_EXAMPLES = [
 
 @pytest.mark.parametrize("path, expected", EXTRACT_DATE_EXAMPLES)
 def test_extract_date_positive(path, expected):
-    logger = logging.getLogger("test")
-    result = extract_date(path, logger)
+    result = extract_date(path)
 
     assert result == expected
 
 
 def test_extract_date_no_date_negative(caplog):
-    logger = logging.getLogger("test")
-
-    with caplog.at_level(logging.WARNING):
-        result = extract_date(Path("AWD_no_date_here.tif"), logger)
-
-    assert result == datetime.min
-    assert "Skipping a file without a date: AWD_no_date_here.tif" in caplog.text
+    with pytest.raises(InvalidRasterDateError):
+        extract_date(Path("AWD_no_date_here.tif"))
 
 
 @pytest.mark.parametrize("path", EXTRACT_DATE_EXAMPLES_NEGATIVE)
 def test_extract_date_invalid_date_negative(caplog, path):
-    logger = logging.getLogger("test")
-
-    with caplog.at_level(logging.WARNING):
-        result = extract_date(path, logger)
-
-    assert result == datetime.min
-    assert f"Skipping a file without a date: {path}" in caplog.text
+    with pytest.raises(InvalidRasterDateError):
+        extract_date(path)
 
 
 @pytest.mark.parametrize("path, expected", GET_BACKGROUND_TYPE_EXAMPLES)

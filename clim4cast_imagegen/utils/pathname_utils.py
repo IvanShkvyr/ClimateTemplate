@@ -1,10 +1,10 @@
 from datetime import datetime
-import logging
 from pathlib import Path
-from typing import Optional
+
+from clim4cast_imagegen.core.exceptions import InvalidRasterDateError
 
 
-def extract_date(path: Path, logger: logging.Logger) -> datetime:
+def extract_date(path: Path) -> datetime:
     """
     Extract a date from the file name
     """
@@ -12,9 +12,8 @@ def extract_date(path: Path, logger: logging.Logger) -> datetime:
     date_part = stem.split("_")[-1]
     try:
         return datetime.strptime(date_part, "%Y-%m-%d")
-    except ValueError:
-        logger.warning(f"Skipping a file without a date: {path}")
-        return datetime.min
+    except ValueError as exc:
+        raise InvalidRasterDateError(path) from exc
     
 
 def get_background_type(path: Path) -> str:
