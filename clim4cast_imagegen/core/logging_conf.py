@@ -1,19 +1,23 @@
 import logging
+import os
+import sys
 
-DEFAULT_LOG_FILE = "logger.log"
-DEFAULT_LEVEL = logging.DEBUG # logging.INFO logging.DEBUG
 
-def setup_logger(
-        log_file: str = DEFAULT_LOG_FILE,
-        logger_level: int = DEFAULT_LEVEL,
-        log_name: str = "image_generation",
-        ) -> logging.Logger:
+DEFAULT_LOG_LEVEL = "INFO"
+
+LOG_LEVELS = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
+def setup_logger(log_name: str = "image_generation") -> logging.Logger:
     """
     Configurate and return a logger that logs message to a file and console.
 
     Parameters:
-        log_file (str): path to log file.
-        logger_level (int): logging level.
         log_name (str): log file name.
 
     Return:
@@ -24,7 +28,10 @@ def setup_logger(
     if logger.hasHandlers():
         return logger
 
-    logger.setLevel(logger_level)
+    level_name = os.getenv("CLIM4CAST_LOG_LEVEL", DEFAULT_LOG_LEVEL).upper()
+    level = LOG_LEVELS.get(level_name, logging.INFO)
+    logger.setLevel(level)
+
     formatter = logging.Formatter(
         fmt=(
             "%(asctime)s - [%(levelname)s] - %(name)s"
@@ -34,17 +41,19 @@ def setup_logger(
         )
 
     #Console handler
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logger_level)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(level)
     console_handler.setFormatter(formatter)
 
-    # File handler
-    file_handler = logging.FileHandler(log_file, mode="a")
-    file_handler.setLevel(logger_level)
-    file_handler.setFormatter(formatter)
-
     logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
+
+    # File handler
+    log_file = os.getenv("CLIM4CAST_LOG_FILE")
+    if log_file:
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     logger.propagate = False
 
