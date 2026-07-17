@@ -24,6 +24,7 @@ from clim4cast_imagegen.io.raster_io import reclassify_raster, read_raster_for_v
 from clim4cast_imagegen.services.raster_processor import (
                                             rename_and_copy_images,
                                             )
+from clim4cast_imagegen.core.constants import DPI
 
 from clim4cast_imagegen.utils.palette_utils import PaletteConfig
 
@@ -103,47 +104,50 @@ def create_visualization_countinuous_with_shapefiles(
         norm = BoundaryNorm(boundaries, cmap.N, extend='max')
 
     # Create a figure for the visualization
-    fig, ax = plt.subplots(figsize=(21, 21), dpi=300)
+    fig, ax = plt.subplots(figsize=(21, 21), dpi=DPI)
 
-    # Set the extent of the plot based on the raster transform
-    ax.set_xlim([transform[2], transform[2] + width * transform[0]])
-    ax.set_ylim([transform[5] + height * transform[4], transform[5]])
+    try:
 
-    # Show the raster data with the colormap and normalization
-    show(masked_data, ax=ax, cmap=cmap, norm=norm, transform=transform)
+        # Set the extent of the plot based on the raster transform
+        ax.set_xlim([transform[2], transform[2] + width * transform[0]])
+        ax.set_ylim([transform[5] + height * transform[4], transform[5]])
 
-    # Overlay the shapefiles on the plot
-    sea_shapefile.plot(
-                    ax=ax,
-                    facecolor=(156/255, 156/255, 156/255),
-                    edgecolor='none',
-                    linewidth=3
+        # Show the raster data with the colormap and normalization
+        show(masked_data, ax=ax, cmap=cmap, norm=norm, transform=transform)
+
+        # Overlay the shapefiles on the plot
+        sea_shapefile.plot(
+                        ax=ax,
+                        facecolor=(156/255, 156/255, 156/255),
+                        edgecolor='none',
+                        linewidth=3
+                        )
+        countries_shapefile.plot(
+                                ax=ax,
+                                facecolor='none',
+                                edgecolor='black',
+                                linewidth=1.2
+                                )
+        central_countries_shapefile.plot(
+                                        ax=ax,
+                                        facecolor='none',
+                                        edgecolor='black',
+                                        linewidth=3.2
+                                        )
+
+        ax.set_axis_off()
+        
+        # Save the final visualization as a PNG image
+        plt.savefig(
+                    final_path,
+                    format='png',
+                    dpi=DPI,
+                    bbox_inches='tight',
+                    pad_inches=-0.04
                     )
-    countries_shapefile.plot(
-                            ax=ax,
-                            facecolor='none',
-                            edgecolor='black',
-                            linewidth=1.2
-                            )
-    central_countries_shapefile.plot(
-                                    ax=ax,
-                                    facecolor='none',
-                                    edgecolor='black',
-                                    linewidth=3.2
-                                    )
 
-    ax.set_axis_off()
-    
-    # Save the final visualization as a PNG image
-    plt.savefig(
-                final_path,
-                format='png',
-                dpi=300,
-                bbox_inches='tight',
-                pad_inches=-0.04
-                )
-    # Close the figure to free memory
-    plt.close(fig)
+    finally:
+        plt.close(fig)
 
 
 def generate_palette_images(
