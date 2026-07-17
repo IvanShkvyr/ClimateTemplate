@@ -1015,3 +1015,4 @@ CRS_FOR_DATA = CRS.from_epsg(3857)
 
 RETRY_INTERVAL = 900  # TODO seconds
 
+DPI = 150
