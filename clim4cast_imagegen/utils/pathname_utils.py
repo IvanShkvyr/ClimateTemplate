@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
 from clim4cast_imagegen.core.exceptions import InvalidRasterDateError
 
@@ -16,7 +17,7 @@ def extract_date(path: Path) -> datetime:
         raise InvalidRasterDateError(path) from exc
     
 
-def get_background_type(path: Path) -> str:
+def background_type_from_template(path: Path) -> str:
     """
     Extract and normalize the background type from a file path.
     """
@@ -27,6 +28,23 @@ def get_background_type(path: Path) -> str:
         background_type = background_type[3:-2]
     else:
         background_type = background_type[3:]
+
+    return background_type
+
+
+def background_type_from_raster(
+        raster_parts_name: List[str],
+        ) -> str:
+    """
+    Determine the background type based on raster type
+    """
+    if "AW" in raster_parts_name[0]:
+        background_type = "_".join([raster_parts_name[0], raster_parts_name[1]])
+        background_type = background_type[:-2]
+    elif "FWI" in raster_parts_name[0]:
+        background_type = "FWI_GenZ"
+    else:
+        background_type = raster_parts_name[0]
 
     return background_type
 

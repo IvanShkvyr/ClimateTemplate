@@ -6,7 +6,8 @@ import pytest
 
 from clim4cast_imagegen.utils.pathname_utils import (
     extract_date,
-    get_background_type,
+    background_type_from_template,
+    background_type_from_raster,
     normalize_dfm_single_part,
     normalize_dfm_name_parts,
     build_new_filename,
@@ -36,6 +37,26 @@ GET_BACKGROUND_TYPE_EXAMPLES = [
     (Path("bg_FWI_GenZ.png"), "FWI_GenZ"),
     (Path("bg_HI.png"), "HI"),
     (Path("bg_UTCI.png"), "UTCI"),
+]
+
+BACKGROUND_TYPE_FROM_RAS_EXAMPLES = [
+    (["AWD", "0-40cm", "2026-07-01"],  "AWD_0-40"),
+    (["AWP", "0-200cm", "2026-07-01"], "AWP_0-200"),
+    (["AWR", "0-100cm", "2026-07-01"], "AWR_0-100"),
+    (["FWI", "2026-07-01"],            "FWI_GenZ"),
+    (["DFM10H", "2026-07-01"],         "DFM10H"),
+    (["HI", "2026-07-01"],             "HI"),
+    (["UTCI", "2026-07-01"],           "UTCI"),
+]
+
+BACKGROUND_TYPE_CONTRACT_PAIRS = [
+    (["AWD", "0-40cm", "2026-07-01"],  Path("bg_AWD_0-40cm.png")),
+    (["AWP", "0-200cm", "2026-07-01"], Path("bg_AWP_0-200cm.png")),
+    (["AWR", "0-100cm", "2026-07-01"], Path("bg_AWR_0-100cm.png")),
+    (["FWI", "2026-07-01"],            Path("bg_FWI_GenZ.png")),
+    (["DFM1H", "2026-07-01"],          Path("bg_DFM1H.png")),
+    (["HI", "2026-07-01"],             Path("bg_HI.png")),
+    (["UTCI", "2026-07-01"],           Path("bg_UTCI.png")),
 ]
 
 NORMALIZE_DFM_SINGLE_PART_EXAMPLES = [
@@ -87,9 +108,21 @@ def test_extract_date_invalid_date_negative(caplog, path):
 
 @pytest.mark.parametrize("path, expected", GET_BACKGROUND_TYPE_EXAMPLES)
 def test_get_background_type(path, expected):
-    result = get_background_type(path)
+    result = background_type_from_template(path)
 
     assert result == expected
+
+
+@pytest.mark.parametrize("parts, expected", BACKGROUND_TYPE_FROM_RAS_EXAMPLES)
+def test_background_type_from_raster(parts, expected):
+    assert background_type_from_raster(parts) == expected
+
+
+@pytest.mark.parametrize("raster_parts, template_path", BACKGROUND_TYPE_CONTRACT_PAIRS)
+def test_background_type_contract(raster_parts, template_path):
+    key_from_raster = background_type_from_raster(raster_parts)
+    key_from_template = background_type_from_template(template_path)
+    assert key_from_raster == key_from_template
 
 
 @pytest.mark.parametrize("raw, expected", NORMALIZE_DFM_SINGLE_PART_EXAMPLES)
