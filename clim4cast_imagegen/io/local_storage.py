@@ -4,11 +4,13 @@ import logging
 from pathlib import Path
 import os
 import shutil
-from typing import Iterable
-import time
+from typing import Iterable, Optional
 
-from clim4cast_imagegen.core.constants import PARAMETERS, RETRY_INTERVAL
-from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.core.constants import PARAMETERS
+from clim4cast_imagegen.core.config import AppConfig, PROJECT_ROOT
+
+
+MARKER_FILE = PROJECT_ROOT / "state" / "last_processed.txt"
 
 
 def prepare_environment(config: AppConfig, logger: logging.Logger) -> None:
@@ -98,28 +100,24 @@ def grab_files(
                 yield element
  
 
-def wait_for_input_data(
+def find_input_data(
         config: AppConfig,
         logger: logging.Logger,
-        retry_interval: int = RETRY_INTERVAL
-        ) -> Path:
+        ) -> Optional[Path]:
     """
-    Wait until today's input data folder exists
+    Return today's input data folder if it exists, else None.
     """
-    path_to_source = config.source_path
     today = date.today()
 
     # Creating a path to the data folder
-    path_to_data = create_data_folder_path(path_to_source, today)
+    path_to_data = create_data_folder_path(config.source_path, today)
 
+    if path_to_data.exists():
+        return path_to_data
 
-    while not (path_to_data).exists():
-        logger.warning(f"Input data folder not found."
-                f"Image generation process will retry in"
-                f" {int(retry_interval//60)} minutes.")
-        time.sleep(retry_interval)
+    logger.info(f"Input data not ready yet.")
 
-    return path_to_data
+    return None
 
 
 def find_png_files_grouped_by_dir(root: Path) -> dict[Path, list[Path]]:
@@ -135,3 +133,16 @@ def find_png_files_grouped_by_dir(root: Path) -> dict[Path, list[Path]]:
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+
+
+def is_already_processed(today: date, marker_file: Path = MARKER_FILE) -> bool:
+    """True if today's date is already recorded as processed."""
+    if not marker_file.exists():
+        return False
+    return marker_file.read_text().strip() == today.isoformat()
+
+
+def mark_processed(today: date, marker_file: Path = MARKER_FILE) -> None:
+    """Record today's date as processed (create the state dir if needed)."""
+    marker_file.parent.mkdir(parents=True, exist_ok=True)
+    marker_file.write_text(today.isoformat())
