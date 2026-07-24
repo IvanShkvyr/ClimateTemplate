@@ -27,6 +27,7 @@ from clim4cast_imagegen.services.raster_processor import (
 from clim4cast_imagegen.core.constants import DPI
 from clim4cast_imagegen.io.image_io import trim_image_sides
 from clim4cast_imagegen.utils.palette_utils import PaletteConfig
+from clim4cast_imagegen.utils.pathname_utils import background_type_from_raster
 
 
 def create_visualization_countinuous_with_shapefiles(
@@ -253,14 +254,13 @@ def process_single_raster(
     """
     # Extract the type of raster from the file name
     raster_parts_name = raster_path.stem.split("_")
-    raster_type = raster_parts_name[0]
 
     # Choose palette based on raster type
-    if raster_type not in palettes:
+    if raster_parts_name[0] not in palettes:
         return None
 
     # Load the palette and boundaries for the given raster type
-    palette = palettes[raster_type]
+    palette = palettes[raster_parts_name[0]]
     boundaries = palette.boundaries
     colors = palette.colors
     classes = palette.classes
@@ -282,13 +282,6 @@ def process_single_raster(
                                 sea_shapefile,
                                 continuous)
 
-    # Determine the background type based on raster type
-    if "AW" in raster_type:
-        background_type = "_".join([raster_parts_name[0], raster_parts_name[1]])
-        background_type = background_type[:-2]
-    elif "FWI" in raster_type:
-        background_type = "FWI_GenZ"
-    else:
-        background_type = raster_parts_name[0]
+    background_type = background_type_from_raster(raster_parts_name)
 
     return background_type, img_path
