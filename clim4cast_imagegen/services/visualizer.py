@@ -25,7 +25,7 @@ from clim4cast_imagegen.services.raster_processor import (
                                             rename_and_copy_images,
                                             )
 from clim4cast_imagegen.core.constants import DPI
-
+from clim4cast_imagegen.io.image_io import trim_image_sides
 from clim4cast_imagegen.utils.palette_utils import PaletteConfig
 
 
@@ -145,6 +145,8 @@ def create_visualization_countinuous_with_shapefiles(
                     bbox_inches='tight',
                     pad_inches=-0.04
                     )
+
+        trim_image_sides(Path(final_path), left=15, bottom=15)
 
     finally:
         plt.close(fig)
