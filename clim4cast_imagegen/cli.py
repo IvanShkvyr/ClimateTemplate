@@ -1,12 +1,15 @@
 import asyncio
+from datetime import date
 import sys
 
 from clim4cast_imagegen.core.config import load_app_config
 from clim4cast_imagegen.core.logging_conf import setup_logger
 from clim4cast_imagegen.io.local_storage import (
-                                    wait_for_input_data,
+                                    find_input_data,
                                     prepare_environment,
-                                    cleanup
+                                    cleanup,
+                                    is_already_processed,
+                                    mark_processed
                                     )
 from clim4cast_imagegen.io.api import upload_results_async
 from clim4cast_imagegen.services.raster_processor import generate_base_raster
@@ -14,7 +17,6 @@ from clim4cast_imagegen.services.visualizer import generate_visualizations
 from clim4cast_imagegen.services.template_engine import generate_templates
 from clim4cast_imagegen.core.pipeline import run_step, run_step_async
 from clim4cast_imagegen.core.exceptions import Clim4CastError
-
 
 
 async def main() -> None:
@@ -28,9 +30,19 @@ async def main() -> None:
 
     try:
         config = load_app_config()
+        today = date.today()
 
-        # Waiting for data and preparing the environment
-        path_to_data = wait_for_input_data(config, logger)
+        # Skip if today's data was already processed
+        if is_already_processed(today):
+            logger.info("Today's data already processed; nothing to do.")
+            return
+
+        # Skip if input data is not ready yet (timer will retry)
+        path_to_data = find_input_data (config, logger)
+        if path_to_data is None:
+            logger.info("Exiting: input data not ready.")
+            return
+
         prepare_environment(config, logger)
 
         # 1. Creating basic
@@ -66,6 +78,11 @@ async def main() -> None:
             )
 
         logger.info(f"Pipeline finished successfully.")
+
+        # Mark done ONLY after a real delivery (dry-run doesn't upload)
+        if not config.dry_run:
+            mark_processed(today)
+
         cleanup(config, logger)
         logger.info(f"Temporary directories cleaned up.")
 
