@@ -8,6 +8,8 @@ from clim4cast_imagegen.io.local_storage import (
     ensure_dir,
     grab_files,
     find_png_files_grouped_by_dir,
+    is_already_processed,
+    mark_processed
     )
 
 
@@ -109,3 +111,27 @@ def test_find_png_files_grouped_by_dir_empty_root(tmp_path):
     result = find_png_files_grouped_by_dir(tmp_path)
 
     assert result == {}
+
+
+def test_marker_missing_file_is_not_processed(tmp_path):
+    marker = tmp_path / "state" / "last_processed.txt"
+    assert is_already_processed(date(2026, 7, 11), marker) is False
+
+
+def test_marker_after_mark_is_processed(tmp_path):
+    marker = tmp_path / "state" / "last_processed.txt"
+    mark_processed(date(2026, 7, 11), marker)
+    assert is_already_processed(date(2026, 7, 11), marker) is True
+
+
+def test_marker_different_date_is_not_processed(tmp_path):
+    marker = tmp_path / "state" / "last_processed.txt"
+    mark_processed(date(2026, 7, 11), marker)
+    assert is_already_processed(date(2026, 7, 12), marker) is False
+
+
+def test_mark_processed_creates_state_dir(tmp_path):
+    marker = tmp_path / "state" / "last_processed.txt"
+    mark_processed(date(2026, 7, 11), marker)
+    assert marker.exists()
+    assert marker.read_text().strip() == "2026-07-11"
