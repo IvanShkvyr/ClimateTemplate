@@ -21,7 +21,7 @@ def load_visual_shapefiles(
         config: AppConfig, logger: logging.Logger
         ) -> VisualLayers:
     """
-    Orchestrates loading of all necessary vector layers
+    Load all vector layers needed for visualization.
     """
     return VisualLayers(
     countries=load_shp(config.shapes.countries, logger),
@@ -36,21 +36,19 @@ def load_shp(
         target_crs: CRS = CRS_FOR_DATA,
         ) -> gpd.GeoDataFrame:
     """
-    Loads a shapefile into a GeoDataFrame and transforms it to a specified CRS
-    if needed.
+    Load a shapefile and reproject it to the target CRS.
     """
     if not path.exists():
         logger.error(f"Shapefile missing: {path}")
         raise FileNotFoundError(f"Could not find shapefile at {path}")
-    
+
     try:
-        # Read the shapefile into a GeoDataFrame
         shp_file = gpd.read_file(path)
 
         if shp_file.crs is None or not shp_file.crs.equals(target_crs):
             logger.debug(f"Reprojecting {path.name} to {target_crs.to_epsg()}")
             shp_file = shp_file.to_crs(target_crs)
-        
+
         return shp_file
     except Exception as err:
         logger.exception(f"Failed to load shapefile {path.name}: {err}")

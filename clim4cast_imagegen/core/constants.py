@@ -1,5 +1,5 @@
-from pyproj import CRS
 import numpy as np
+from pyproj import CRS
 
 # PALETTES is a dictionary containing color palettes, boundary ranges, and class
 # values for different climatic data types. Each key represents a specific
@@ -9,10 +9,10 @@ import numpy as np
 # - "boundaries": A list of boundary values that define the range for each class
 # - "classes": A list of class values, where each class corresponds to a
 #       specific range of values in the data.
-# - "continuous_coloring": A boolean flag that determines whether to use a 
+# - "continuous_coloring": A boolean flag that determines whether to use a
 #       continuous color gradient between boundaries (True) or discrete classes
 #       (False).
-# 
+#
 # The class values -999 and -1 are reserved for NoData values, representing
 #   areas with no available data.
 PALETTES_V2 = {
@@ -194,30 +194,30 @@ PALETTES_V1 = {
         "colors": [
         (255, 255, 255),  # -999 (NoData)
         (np.int64(64), np.int64(11), np.int64(0)), # -100
-        (np.int64(65), np.int64(10), np.int64(0)), # -99 
-        (np.int64(66), np.int64(10), np.int64(0)), # -98 
-        (np.int64(68), np.int64(10), np.int64(0)), # -97 
-        (np.int64(69), np.int64(10), np.int64(0)), # -96 
-        (np.int64(71), np.int64(9), np.int64(0)), # -95  
-        (np.int64(72), np.int64(9), np.int64(0)), # -94  
-        (np.int64(73), np.int64(9), np.int64(0)), # -93  
-        (np.int64(75), np.int64(9), np.int64(0)), # -92  
-        (np.int64(76), np.int64(8), np.int64(0)), # -91  
-        (np.int64(78), np.int64(8), np.int64(0)), # -90  
-        (np.int64(79), np.int64(8), np.int64(0)), # -89  
-        (np.int64(80), np.int64(8), np.int64(0)), # -88  
-        (np.int64(82), np.int64(7), np.int64(0)), # -87  
-        (np.int64(83), np.int64(7), np.int64(0)), # -86  
-        (np.int64(85), np.int64(7), np.int64(0)), # -85  
-        (np.int64(86), np.int64(7), np.int64(0)), # -84  
-        (np.int64(87), np.int64(6), np.int64(0)), # -83  
-        (np.int64(89), np.int64(6), np.int64(0)), # -82  
-        (np.int64(90), np.int64(6), np.int64(0)), # -81  
-        (np.int64(92), np.int64(6), np.int64(0)), # -80  
-        (np.int64(93), np.int64(8), np.int64(0)), # -79  
-        (np.int64(95), np.int64(10), np.int64(0)), # -78 
-        (np.int64(97), np.int64(13), np.int64(0)), # -77 
-        (np.int64(99), np.int64(15), np.int64(0)), # -76 
+        (np.int64(65), np.int64(10), np.int64(0)), # -99
+        (np.int64(66), np.int64(10), np.int64(0)), # -98
+        (np.int64(68), np.int64(10), np.int64(0)), # -97
+        (np.int64(69), np.int64(10), np.int64(0)), # -96
+        (np.int64(71), np.int64(9), np.int64(0)), # -95
+        (np.int64(72), np.int64(9), np.int64(0)), # -94
+        (np.int64(73), np.int64(9), np.int64(0)), # -93
+        (np.int64(75), np.int64(9), np.int64(0)), # -92
+        (np.int64(76), np.int64(8), np.int64(0)), # -91
+        (np.int64(78), np.int64(8), np.int64(0)), # -90
+        (np.int64(79), np.int64(8), np.int64(0)), # -89
+        (np.int64(80), np.int64(8), np.int64(0)), # -88
+        (np.int64(82), np.int64(7), np.int64(0)), # -87
+        (np.int64(83), np.int64(7), np.int64(0)), # -86
+        (np.int64(85), np.int64(7), np.int64(0)), # -85
+        (np.int64(86), np.int64(7), np.int64(0)), # -84
+        (np.int64(87), np.int64(6), np.int64(0)), # -83
+        (np.int64(89), np.int64(6), np.int64(0)), # -82
+        (np.int64(90), np.int64(6), np.int64(0)), # -81
+        (np.int64(92), np.int64(6), np.int64(0)), # -80
+        (np.int64(93), np.int64(8), np.int64(0)), # -79
+        (np.int64(95), np.int64(10), np.int64(0)), # -78
+        (np.int64(97), np.int64(13), np.int64(0)), # -77
+        (np.int64(99), np.int64(15), np.int64(0)), # -76
         (np.int64(101), np.int64(18), np.int64(0)), # -75
         (np.int64(103), np.int64(20), np.int64(0)), # -74
         (np.int64(105), np.int64(22), np.int64(1)), # -73
@@ -404,20 +404,20 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(102), np.int64(60), np.int64(9)), # 0
-            (np.int64(108), np.int64(65), np.int64(15)), # 1   
-            (np.int64(114), np.int64(70), np.int64(21)), # 2   
-            (np.int64(120), np.int64(75), np.int64(27)), # 3   
-            (np.int64(126), np.int64(81), np.int64(34)), # 4   
-            (np.int64(132), np.int64(86), np.int64(40)), # 5   
-            (np.int64(138), np.int64(91), np.int64(46)), # 6   
-            (np.int64(144), np.int64(97), np.int64(53)), # 7   
-            (np.int64(150), np.int64(102), np.int64(59)), # 8  
-            (np.int64(156), np.int64(107), np.int64(65)), # 9  
-            (np.int64(163), np.int64(113), np.int64(72)), # 10 
-            (np.int64(166), np.int64(117), np.int64(77)), # 11 
-            (np.int64(170), np.int64(121), np.int64(83)), # 12 
-            (np.int64(174), np.int64(125), np.int64(89)), # 13 
-            (np.int64(178), np.int64(130), np.int64(95)), # 14 
+            (np.int64(108), np.int64(65), np.int64(15)), # 1
+            (np.int64(114), np.int64(70), np.int64(21)), # 2
+            (np.int64(120), np.int64(75), np.int64(27)), # 3
+            (np.int64(126), np.int64(81), np.int64(34)), # 4
+            (np.int64(132), np.int64(86), np.int64(40)), # 5
+            (np.int64(138), np.int64(91), np.int64(46)), # 6
+            (np.int64(144), np.int64(97), np.int64(53)), # 7
+            (np.int64(150), np.int64(102), np.int64(59)), # 8
+            (np.int64(156), np.int64(107), np.int64(65)), # 9
+            (np.int64(163), np.int64(113), np.int64(72)), # 10
+            (np.int64(166), np.int64(117), np.int64(77)), # 11
+            (np.int64(170), np.int64(121), np.int64(83)), # 12
+            (np.int64(174), np.int64(125), np.int64(89)), # 13
+            (np.int64(178), np.int64(130), np.int64(95)), # 14
             (np.int64(182), np.int64(134), np.int64(101)), # 15
             (np.int64(185), np.int64(138), np.int64(107)), # 16
             (np.int64(189), np.int64(143), np.int64(113)), # 17
@@ -807,19 +807,19 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(115), np.int64(0), np.int64(0)), # 0
-            (np.int64(127), np.int64(7), np.int64(0)), # 1     
-            (np.int64(140), np.int64(15), np.int64(0)), # 2    
-            (np.int64(153), np.int64(23), np.int64(0)), # 3    
-            (np.int64(173), np.int64(32), np.int64(0)), # 4    
-            (np.int64(193), np.int64(41), np.int64(0)), # 5    
-            (np.int64(214), np.int64(50), np.int64(0)), # 6    
-            (np.int64(224), np.int64(76), np.int64(10)), # 7   
-            (np.int64(234), np.int64(102), np.int64(21)), # 8  
-            (np.int64(245), np.int64(128), np.int64(32)), # 9  
-            (np.int64(247), np.int64(158), np.int64(45)), # 10 
-            (np.int64(249), np.int64(188), np.int64(58)), # 11 
-            (np.int64(252), np.int64(219), np.int64(71)), # 12 
-            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(127), np.int64(7), np.int64(0)), # 1
+            (np.int64(140), np.int64(15), np.int64(0)), # 2
+            (np.int64(153), np.int64(23), np.int64(0)), # 3
+            (np.int64(173), np.int64(32), np.int64(0)), # 4
+            (np.int64(193), np.int64(41), np.int64(0)), # 5
+            (np.int64(214), np.int64(50), np.int64(0)), # 6
+            (np.int64(224), np.int64(76), np.int64(10)), # 7
+            (np.int64(234), np.int64(102), np.int64(21)), # 8
+            (np.int64(245), np.int64(128), np.int64(32)), # 9
+            (np.int64(247), np.int64(158), np.int64(45)), # 10
+            (np.int64(249), np.int64(188), np.int64(58)), # 11
+            (np.int64(252), np.int64(219), np.int64(71)), # 12
+            (np.int64(253), np.int64(226), np.int64(94)), # 13
             (np.int64(254), np.int64(234), np.int64(117)), # 14
             (np.int64(255), np.int64(242), np.int64(140)), # 15
             (np.int64(255), np.int64(246), np.int64(165)), # 16
@@ -830,10 +830,10 @@ PALETTES_V1 = {
             (np.int64(161), np.int64(183), np.int64(209)), # 21
             (np.int64(136), np.int64(164), np.int64(202)), # 22
             (np.int64(111), np.int64(146), np.int64(196)), # 23
-            (np.int64(86), np.int64(127), np.int64(190)), # 24 
-            (np.int64(62), np.int64(109), np.int64(184)), # 25 
-            (np.int64(55), np.int64(98), np.int64(174)), # 26  
-            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(86), np.int64(127), np.int64(190)), # 24
+            (np.int64(62), np.int64(109), np.int64(184)), # 25
+            (np.int64(55), np.int64(98), np.int64(174)), # 26
+            (np.int64(49), np.int64(87), np.int64(164)), # 27
             (np.int64(43), np.int64(76), np.int64(154)), # 28
             (np.int64(37), np.int64(65), np.int64(144)), # 29
             (np.int64(31), np.int64(55), np.int64(134)), # 30
@@ -852,19 +852,19 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(115), np.int64(0), np.int64(0)), # 0
-            (np.int64(127), np.int64(7), np.int64(0)), # 1     
-            (np.int64(140), np.int64(15), np.int64(0)), # 2    
-            (np.int64(153), np.int64(23), np.int64(0)), # 3    
-            (np.int64(173), np.int64(32), np.int64(0)), # 4    
-            (np.int64(193), np.int64(41), np.int64(0)), # 5    
-            (np.int64(214), np.int64(50), np.int64(0)), # 6    
-            (np.int64(224), np.int64(76), np.int64(10)), # 7   
-            (np.int64(234), np.int64(102), np.int64(21)), # 8  
-            (np.int64(245), np.int64(128), np.int64(32)), # 9  
-            (np.int64(247), np.int64(158), np.int64(45)), # 10 
-            (np.int64(249), np.int64(188), np.int64(58)), # 11 
-            (np.int64(252), np.int64(219), np.int64(71)), # 12 
-            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(127), np.int64(7), np.int64(0)), # 1
+            (np.int64(140), np.int64(15), np.int64(0)), # 2
+            (np.int64(153), np.int64(23), np.int64(0)), # 3
+            (np.int64(173), np.int64(32), np.int64(0)), # 4
+            (np.int64(193), np.int64(41), np.int64(0)), # 5
+            (np.int64(214), np.int64(50), np.int64(0)), # 6
+            (np.int64(224), np.int64(76), np.int64(10)), # 7
+            (np.int64(234), np.int64(102), np.int64(21)), # 8
+            (np.int64(245), np.int64(128), np.int64(32)), # 9
+            (np.int64(247), np.int64(158), np.int64(45)), # 10
+            (np.int64(249), np.int64(188), np.int64(58)), # 11
+            (np.int64(252), np.int64(219), np.int64(71)), # 12
+            (np.int64(253), np.int64(226), np.int64(94)), # 13
             (np.int64(254), np.int64(234), np.int64(117)), # 14
             (np.int64(255), np.int64(242), np.int64(140)), # 15
             (np.int64(255), np.int64(246), np.int64(165)), # 16
@@ -875,10 +875,10 @@ PALETTES_V1 = {
             (np.int64(161), np.int64(183), np.int64(209)), # 21
             (np.int64(136), np.int64(164), np.int64(202)), # 22
             (np.int64(111), np.int64(146), np.int64(196)), # 23
-            (np.int64(86), np.int64(127), np.int64(190)), # 24 
-            (np.int64(62), np.int64(109), np.int64(184)), # 25 
-            (np.int64(55), np.int64(98), np.int64(174)), # 26  
-            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(86), np.int64(127), np.int64(190)), # 24
+            (np.int64(62), np.int64(109), np.int64(184)), # 25
+            (np.int64(55), np.int64(98), np.int64(174)), # 26
+            (np.int64(49), np.int64(87), np.int64(164)), # 27
             (np.int64(43), np.int64(76), np.int64(154)), # 28
             (np.int64(37), np.int64(65), np.int64(144)), # 29
             (np.int64(31), np.int64(55), np.int64(134)), # 30
@@ -897,19 +897,19 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(115), np.int64(0), np.int64(0)), # 0
-            (np.int64(127), np.int64(7), np.int64(0)), # 1     
-            (np.int64(140), np.int64(15), np.int64(0)), # 2    
-            (np.int64(153), np.int64(23), np.int64(0)), # 3    
-            (np.int64(173), np.int64(32), np.int64(0)), # 4    
-            (np.int64(193), np.int64(41), np.int64(0)), # 5    
-            (np.int64(214), np.int64(50), np.int64(0)), # 6    
-            (np.int64(224), np.int64(76), np.int64(10)), # 7   
-            (np.int64(234), np.int64(102), np.int64(21)), # 8  
-            (np.int64(245), np.int64(128), np.int64(32)), # 9  
-            (np.int64(247), np.int64(158), np.int64(45)), # 10 
-            (np.int64(249), np.int64(188), np.int64(58)), # 11 
-            (np.int64(252), np.int64(219), np.int64(71)), # 12 
-            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(127), np.int64(7), np.int64(0)), # 1
+            (np.int64(140), np.int64(15), np.int64(0)), # 2
+            (np.int64(153), np.int64(23), np.int64(0)), # 3
+            (np.int64(173), np.int64(32), np.int64(0)), # 4
+            (np.int64(193), np.int64(41), np.int64(0)), # 5
+            (np.int64(214), np.int64(50), np.int64(0)), # 6
+            (np.int64(224), np.int64(76), np.int64(10)), # 7
+            (np.int64(234), np.int64(102), np.int64(21)), # 8
+            (np.int64(245), np.int64(128), np.int64(32)), # 9
+            (np.int64(247), np.int64(158), np.int64(45)), # 10
+            (np.int64(249), np.int64(188), np.int64(58)), # 11
+            (np.int64(252), np.int64(219), np.int64(71)), # 12
+            (np.int64(253), np.int64(226), np.int64(94)), # 13
             (np.int64(254), np.int64(234), np.int64(117)), # 14
             (np.int64(255), np.int64(242), np.int64(140)), # 15
             (np.int64(255), np.int64(246), np.int64(165)), # 16
@@ -920,10 +920,10 @@ PALETTES_V1 = {
             (np.int64(161), np.int64(183), np.int64(209)), # 21
             (np.int64(136), np.int64(164), np.int64(202)), # 22
             (np.int64(111), np.int64(146), np.int64(196)), # 23
-            (np.int64(86), np.int64(127), np.int64(190)), # 24 
-            (np.int64(62), np.int64(109), np.int64(184)), # 25 
-            (np.int64(55), np.int64(98), np.int64(174)), # 26  
-            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(86), np.int64(127), np.int64(190)), # 24
+            (np.int64(62), np.int64(109), np.int64(184)), # 25
+            (np.int64(55), np.int64(98), np.int64(174)), # 26
+            (np.int64(49), np.int64(87), np.int64(164)), # 27
             (np.int64(43), np.int64(76), np.int64(154)), # 28
             (np.int64(37), np.int64(65), np.int64(144)), # 29
             (np.int64(31), np.int64(55), np.int64(134)), # 30
@@ -942,19 +942,19 @@ PALETTES_V1 = {
             (255, 255, 255),  # -999 (NoData)
             (255, 255, 255),  # -1 (NoData)
             (np.int64(115), np.int64(0), np.int64(0)), # 0
-            (np.int64(127), np.int64(7), np.int64(0)), # 1     
-            (np.int64(140), np.int64(15), np.int64(0)), # 2    
-            (np.int64(153), np.int64(23), np.int64(0)), # 3    
-            (np.int64(173), np.int64(32), np.int64(0)), # 4    
-            (np.int64(193), np.int64(41), np.int64(0)), # 5    
-            (np.int64(214), np.int64(50), np.int64(0)), # 6    
-            (np.int64(224), np.int64(76), np.int64(10)), # 7   
-            (np.int64(234), np.int64(102), np.int64(21)), # 8  
-            (np.int64(245), np.int64(128), np.int64(32)), # 9  
-            (np.int64(247), np.int64(158), np.int64(45)), # 10 
-            (np.int64(249), np.int64(188), np.int64(58)), # 11 
-            (np.int64(252), np.int64(219), np.int64(71)), # 12 
-            (np.int64(253), np.int64(226), np.int64(94)), # 13 
+            (np.int64(127), np.int64(7), np.int64(0)), # 1
+            (np.int64(140), np.int64(15), np.int64(0)), # 2
+            (np.int64(153), np.int64(23), np.int64(0)), # 3
+            (np.int64(173), np.int64(32), np.int64(0)), # 4
+            (np.int64(193), np.int64(41), np.int64(0)), # 5
+            (np.int64(214), np.int64(50), np.int64(0)), # 6
+            (np.int64(224), np.int64(76), np.int64(10)), # 7
+            (np.int64(234), np.int64(102), np.int64(21)), # 8
+            (np.int64(245), np.int64(128), np.int64(32)), # 9
+            (np.int64(247), np.int64(158), np.int64(45)), # 10
+            (np.int64(249), np.int64(188), np.int64(58)), # 11
+            (np.int64(252), np.int64(219), np.int64(71)), # 12
+            (np.int64(253), np.int64(226), np.int64(94)), # 13
             (np.int64(254), np.int64(234), np.int64(117)), # 14
             (np.int64(255), np.int64(242), np.int64(140)), # 15
             (np.int64(255), np.int64(246), np.int64(165)), # 16
@@ -965,10 +965,10 @@ PALETTES_V1 = {
             (np.int64(161), np.int64(183), np.int64(209)), # 21
             (np.int64(136), np.int64(164), np.int64(202)), # 22
             (np.int64(111), np.int64(146), np.int64(196)), # 23
-            (np.int64(86), np.int64(127), np.int64(190)), # 24 
-            (np.int64(62), np.int64(109), np.int64(184)), # 25 
-            (np.int64(55), np.int64(98), np.int64(174)), # 26  
-            (np.int64(49), np.int64(87), np.int64(164)), # 27  
+            (np.int64(86), np.int64(127), np.int64(190)), # 24
+            (np.int64(62), np.int64(109), np.int64(184)), # 25
+            (np.int64(55), np.int64(98), np.int64(174)), # 26
+            (np.int64(49), np.int64(87), np.int64(164)), # 27
             (np.int64(43), np.int64(76), np.int64(154)), # 28
             (np.int64(37), np.int64(65), np.int64(144)), # 29
             (np.int64(31), np.int64(55), np.int64(134)), # 30

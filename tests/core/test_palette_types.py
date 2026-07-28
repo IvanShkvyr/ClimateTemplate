@@ -1,7 +1,6 @@
 import pytest
 
-from clim4cast_imagegen.core.palette_types import _build_palette_registry, RasterPalette
-
+from clim4cast_imagegen.core.palette_types import RasterPalette, _build_palette_registry
 
 FAKE_RAW_PALETTES = {
     "AWP": {

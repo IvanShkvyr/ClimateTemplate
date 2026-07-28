@@ -31,7 +31,7 @@ def test_trim_removes_the_correct_side(tmp_path):
         img.putpixel((0, y), (255, 0, 0))
     img.save(path)
 
-    trim_image_sides(path, left=1) 
+    trim_image_sides(path, left=1)
 
     with Image.open(path) as result:
         colors = {result.getpixel((x, y)) for x in range(result.width)

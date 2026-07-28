@@ -1,13 +1,13 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List
 
 from clim4cast_imagegen.core.exceptions import InvalidRasterDateError
 
 
 def extract_date(path: Path) -> datetime:
-    """
-    Extract a date from the file name
+    """Extract the date from a filename.
+
+    Raise InvalidRasterDateError if the date is missing or invalid.
     """
     stem = path.stem
     date_part = stem.split("_")[-1]
@@ -15,7 +15,7 @@ def extract_date(path: Path) -> datetime:
         return datetime.strptime(date_part, "%Y-%m-%d")
     except ValueError as exc:
         raise InvalidRasterDateError(path) from exc
-    
+
 
 def background_type_from_template(path: Path) -> str:
     """
@@ -33,28 +33,25 @@ def background_type_from_template(path: Path) -> str:
 
 
 def background_type_from_raster(
-        raster_parts_name: List[str],
+        raster_name_parts: list[str],
         ) -> str:
     """
-    Determine the background type based on raster type
+    Build the background type key from raster filename parts.
     """
-    if "AW" in raster_parts_name[0]:
-        background_type = "_".join([raster_parts_name[0], raster_parts_name[1]])
+    if "AW" in raster_name_parts[0]:
+        background_type = "_".join([raster_name_parts[0], raster_name_parts[1]])
         background_type = background_type[:-2]
-    elif "FWI" in raster_parts_name[0]:
+    elif "FWI" in raster_name_parts[0]:
         background_type = "FWI_GenZ"
     else:
-        background_type = raster_parts_name[0]
+        background_type = raster_name_parts[0]
 
     return background_type
 
 
 def normalize_dfm_single_part(part: str) -> str:
     """
-    Normalizes name parts by fixing DFM prefix
-
-    Example:
-        DFM100 -> DFM_100
+    Add an underscore after the DFM prefix (DFM100 -> DFM_100).
     """
     if part.startswith("DFM") and len(part) > 3:
         return f"DFM_{part[3:]}"
@@ -63,17 +60,14 @@ def normalize_dfm_single_part(part: str) -> str:
 
 def normalize_dfm_name_parts(parts: list[str]) -> list[str]:
     """
-    Normalizes name parts by fixing DFM prefix
-
-    Example:
-        DFM100 -> DFM_100
+    Apply the DFM prefix fix to every part of a filename.
     """
     return [normalize_dfm_single_part(p) for p in parts]
 
 
 def build_new_filename(path: Path, index: int) -> str:
     """
-    Builds a new filename based on the original name and index
+    Build a new filename from the original name and an index.
     """
     name_parts = path.stem.split("_")[:-1]
     name_parts = normalize_dfm_name_parts(name_parts)

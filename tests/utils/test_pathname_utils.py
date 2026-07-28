@@ -1,19 +1,17 @@
-import logging
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
-from clim4cast_imagegen.utils.pathname_utils import (
-    extract_date,
-    background_type_from_template,
-    background_type_from_raster,
-    normalize_dfm_single_part,
-    normalize_dfm_name_parts,
-    build_new_filename,
-)
 from clim4cast_imagegen.core.exceptions import InvalidRasterDateError
-
+from clim4cast_imagegen.utils.pathname_utils import (
+    background_type_from_raster,
+    background_type_from_template,
+    build_new_filename,
+    extract_date,
+    normalize_dfm_name_parts,
+    normalize_dfm_single_part,
+)
 
 EXTRACT_DATE_EXAMPLES = [
     (Path("AWD_0-100cm_2026-07-06.tif"), datetime(2026, 7, 6)),

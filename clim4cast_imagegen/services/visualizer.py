@@ -1,104 +1,95 @@
 import matplotlib
+
 matplotlib.use("Agg")
 
+import logging
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-import logging
 from multiprocessing import cpu_count
 from pathlib import Path
 
 import geopandas as gpd
-from matplotlib.colors import (
-    BoundaryNorm, ListedColormap, Normalize, LinearSegmentedColormap
-    )
 import matplotlib.pyplot as plt
 import numpy as np
-import rasterio
+from matplotlib.colors import (
+    BoundaryNorm,
+    LinearSegmentedColormap,
+    ListedColormap,
+    Normalize,
+)
 from rasterio.plot import show
 from tqdm import tqdm
 
 from clim4cast_imagegen.core.config import AppConfig
-from clim4cast_imagegen.core.palette_types import PALETTE_REGISTRY_V1, PALETTE_REGISTRY_V2
-from clim4cast_imagegen.io.shp_io import load_visual_shapefiles, VisualLayers
-from clim4cast_imagegen.io.raster_io import reclassify_raster, read_raster_for_visualization
-from clim4cast_imagegen.services.raster_processor import (
-                                            rename_and_copy_images,
-                                            )
 from clim4cast_imagegen.core.constants import DPI
+from clim4cast_imagegen.core.palette_types import (
+    PALETTE_REGISTRY_V1,
+    PALETTE_REGISTRY_V2,
+)
 from clim4cast_imagegen.io.image_io import trim_image_sides
+from clim4cast_imagegen.io.raster_io import (
+    read_raster_for_visualization,
+    reclassify_raster,
+)
+from clim4cast_imagegen.io.shp_io import VisualLayers, load_visual_shapefiles
+from clim4cast_imagegen.services.raster_processor import (
+    rename_and_copy_images,
+)
 from clim4cast_imagegen.utils.palette_utils import PaletteConfig
 from clim4cast_imagegen.utils.pathname_utils import background_type_from_raster
 
 
-def create_visualization_countinuous_with_shapefiles(
-                                raster_file: str, 
-                                final_path: str, 
-                                colors_list: list[tuple], 
-                                boundaries: list[float], 
-                                countries_shapefile: gpd.GeoDataFrame, 
-                                central_countries_shapefile: gpd.GeoDataFrame, 
+def create_map_visualization(
+                                raster_file: str,
+                                final_path: str,
+                                colors: list[tuple],
+                                boundaries: list[float],
+                                countries_shapefile: gpd.GeoDataFrame,
+                                central_countries_shapefile: gpd.GeoDataFrame,
                                 sea_shapefile: gpd.GeoDataFrame,
                                 continuous: bool = True
                                 ) -> None:
-    """
-    Creates a visualization by overlaying raster data with shapefiles and
-    saving the output as a PNG image. Works with both classified and continuous
-    data.
-
-    Args:
-        raster_file (str): The path to the raster file to be visualized.
-        final_path (str): The path where the output PNG image will be saved.
-        colors_list (List[tuple]): A list of RGB colors to represent the data
-            values at boundaries.
-        boundaries (List[float]): A list of boundaries for color mapping. For
-            continuous data, these define where each color in colors_list should
-            be placed.
-        countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
-            boundaries of countries.
-        central_countries_shapefile (gpd.GeoDataFrame): A GeoDataFrame
-            representing the boundaries of central countries.
-        sea_shapefile (gpd.GeoDataFrame): A GeoDataFrame representing the
-            boundaries of seas.
-        continuous (bool, optional): If True, uses a continuous color gradient
-            between boundaries. If False, uses discrete classes.
-
-    Returns:
-        None: The function saves the resulting plot to the specified
-            `final_path` as a PNG image.
-    """
-    raster_data, transform, nodata_value, width, height = read_raster_for_visualization(raster_file)
+    """Render a raster as a PNG map with country and sea layers on top."""
+    raster_data, transform, nodata_value, width, height = (
+        read_raster_for_visualization(raster_file)
+    )
 
     # Create a mask for NoData values and -999 values
     mask = (raster_data == -999)
     if nodata_value is not None:
         mask = np.logical_or(mask, raster_data == nodata_value)
-    
+
     # Apply the mask
     masked_data = np.ma.masked_where(mask, raster_data)
-    
+
     # Normalize colors to 0-1 range for matplotlib
-    normalized_colors = [tuple(c / 255.0 for c in color) for color in colors_list]
-    
+    normalized_colors = [
+        tuple(c / 255.0 for c in color) for color in colors
+        ]
+
     if continuous:
-        # Create a mask for NoData values 
+        # Create a mask for NoData values
         no_data_mask = np.logical_or(raster_data == -999, raster_data == -1)
-        
-        # Calculate color positions based on boundaries 
+
+        # Calculate color positions based on boundaries
         min_val = boundaries[1]  # First valid boundary after NoData
         max_val = boundaries[-1]
-        positions = [(boundary - min_val) / (max_val - min_val) for boundary in boundaries[1:]]
+        positions = [
+            (boundary - min_val) / (max_val - min_val)
+            for boundary in boundaries[1:]
+            ]
         positions = [0] + positions  # Add 0 for the first color
-        
+
         # Create a color map
-        cmap = LinearSegmentedColormap.from_list("custom_cmap", 
-                            list(zip(positions, normalized_colors[1:])))
-        
-        # Create a color map
+        cmap = LinearSegmentedColormap.from_list("custom_cmap",
+                    list(zip(positions, normalized_colors[1:], strict=True)))
+
+        # Create a normalizer for the value range
         norm = Normalize(vmin=min_val, vmax=max_val)
-        
+
         # Apply mask for NoData values
         masked_data = np.ma.masked_where(no_data_mask, raster_data)
-    
+
     else:
         # For discrete classes, use the original approach
         cmap = ListedColormap(normalized_colors)
@@ -137,7 +128,7 @@ def create_visualization_countinuous_with_shapefiles(
                                         )
 
         ax.set_axis_off()
-        
+
         # Save the final visualization as a PNG image
         plt.savefig(
                     final_path,
@@ -190,8 +181,8 @@ def generate_palette_images(
             if bg_type not in layout_index:
                 layout_index[bg_type] = []
             layout_index[bg_type].append(path)
-        
-    logger.info(f"Preparing single raster data for the website")
+
+    logger.info("Preparing single raster data for the website")
     rename_and_copy_images(
         files_map=layout_index,
         dst_root=palette_cfg.final_dir,
@@ -207,11 +198,10 @@ def generate_visualizations(
                             logger: logging.Logger
                             ) -> dict:
     """
-    Orchestrates visualization generation for all pallete variants.
+    Orchestrate visualization generation for all palette variants.
     """
-    # Load shapefiles
     shapefiles = load_visual_shapefiles(config, logger)
-    logger.info(f"Loaded basic shapefiles")
+    logger.info("Loaded basic shapefiles")
 
     palette_configs = [
         PaletteConfig(
@@ -250,17 +240,17 @@ def process_single_raster(
         palettes: dict
         ):
     """
-    
+    Render one raster to PNG and return its background type and image path.
     """
     # Extract the type of raster from the file name
-    raster_parts_name = raster_path.stem.split("_")
+    raster_name_parts = raster_path.stem.split("_")
 
     # Choose palette based on raster type
-    if raster_parts_name[0] not in palettes:
+    if raster_name_parts[0] not in palettes:
         return None
 
     # Load the palette and boundaries for the given raster type
-    palette = palettes[raster_parts_name[0]]
+    palette = palettes[raster_name_parts[0]]
     boundaries = palette.boundaries
     colors = palette.colors
     classes = palette.classes
@@ -272,16 +262,16 @@ def process_single_raster(
     img_path = Path(work_folder) / Path(raster_path).name
 
     # Create visualization with shapefiles as overlays
-    create_visualization_countinuous_with_shapefiles(
-                                raster_path, 
-                                img_path, 
-                                colors, 
-                                classes, 
+    create_map_visualization(
+                                raster_path,
+                                img_path,
+                                colors,
+                                classes,
                                 countries_shapefile,
                                 central_countries_shapefile,
                                 sea_shapefile,
                                 continuous)
 
-    background_type = background_type_from_raster(raster_parts_name)
+    background_type = background_type_from_raster(raster_name_parts)
 
     return background_type, img_path
