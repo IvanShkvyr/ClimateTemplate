@@ -99,7 +99,7 @@ def test_missing_root_folder_returns_empty_report(tmp_path):
     missing = tmp_path / "no_such_dir"
     report = asyncio.run(upload_files_to_api(
         base_url="http://x", username="u", password="p",
-        root_folder=str(missing), logger=logging.getLogger("test"),
+        root_folder=missing, logger=logging.getLogger("test"),
     ))
     assert report.uploaded == []
     assert report.failed == []
@@ -117,7 +117,7 @@ def test_report_counts_uploaded_and_failed(tmp_path, monkeypatch):
 
     report = asyncio.run(upload_files_to_api(
         base_url="http://x", username="u", password="p",
-        root_folder=str(tmp_path), logger=logging.getLogger("test"),
+        root_folder=tmp_path, logger=logging.getLogger("test"),
     ))
     assert report.total == 3
     assert len(report.uploaded) == 2

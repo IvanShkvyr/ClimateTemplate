@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Any
 
 from tqdm import tqdm
 
@@ -46,7 +47,7 @@ def generate_base_raster(
 
 def process_rasters(
                     rasters: list[Path],
-                    mask_shape: dict,
+                    mask_shape: list[Any],
                     temp_folder: Path,
                     temp_folder_img: Path,
                     ) -> list[Path]:

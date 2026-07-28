@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -49,18 +48,16 @@ async def upload_files_to_api(
                         base_url: str,
                         username: str,
                         password: str,
-                        root_folder: str,
+                        root_folder: Path,
                         logger: logging.Logger,
                         max_concurrent: int = 10,
                         ) -> UploadReport:
     """
     Upload every file under the root folder to the Clim4Cast API.
     """
-    if not os.path.isdir(root_folder):
+    if not root_folder.is_dir():
         logger.error(f" Root folder does not exist: {root_folder}")
         return UploadReport(uploaded=[], failed=[])
-
-    root_folder = Path(root_folder)
 
     all_files = list(root_folder.rglob("*.*"))
 

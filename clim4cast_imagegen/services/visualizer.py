@@ -38,8 +38,8 @@ from clim4cast_imagegen.utils.pathname_utils import background_type_from_raster
 
 
 def create_map_visualization(
-                                raster_file: str,
-                                final_path: str,
+                                raster_file: Path,
+                                final_path: Path,
                                 colors: list[tuple],
                                 boundaries: list[float],
                                 countries_shapefile: gpd.GeoDataFrame,
@@ -64,7 +64,6 @@ def create_map_visualization(
         tuple(c / 255.0 for c in color) for color in colors
         ]
 
-    
     # For discrete classes, use the original approach
     cmap = ListedColormap(normalized_colors)
     norm = BoundaryNorm(boundaries, cmap.N, extend='max')
@@ -75,8 +74,8 @@ def create_map_visualization(
     try:
 
         # Set the extent of the plot based on the raster transform
-        ax.set_xlim([transform[2], transform[2] + width * transform[0]])
-        ax.set_ylim([transform[5] + height * transform[4], transform[5]])
+        ax.set_xlim(transform[2], transform[2] + width * transform[0])
+        ax.set_ylim(transform[5] + height * transform[4], transform[5])
 
         # Show the raster data with the colormap and normalization
         show(masked_data, ax=ax, cmap=cmap, norm=norm, transform=transform)
@@ -128,7 +127,7 @@ def generate_palette_images(
     Generate visualization images for a single palette variant.
     """
     logger.info(f"Start visualization for palette: {palette_cfg.name}")
-    layout_index = {}
+    layout_index: dict[str, list[Path]] = {}
 
     worker_func = partial(
         process_single_raster,
