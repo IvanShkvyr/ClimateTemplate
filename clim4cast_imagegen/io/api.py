@@ -1,12 +1,12 @@
 """upload via API (ACTIVE)"""
 
-import aiohttp
 import asyncio
-from dataclasses import dataclass
 import logging
-from pathlib import Path
 import os
-from typing import List
+from dataclasses import dataclass
+from pathlib import Path
+
+import aiohttp
 
 from clim4cast_imagegen.core.config import AppConfig
 from clim4cast_imagegen.core.exceptions import UploadIncompleteError
@@ -14,24 +14,25 @@ from clim4cast_imagegen.core.exceptions import UploadIncompleteError
 
 @dataclass(frozen=True)
 class UploadReport:
-    uploaded: List
-    failed: List
+    uploaded: list
+    failed: list
 
     @property
     def total(self) -> int:
+        """Number of files processed: uploaded plus failed."""
         return len(self.uploaded) + len(self.failed)
 
 
 
-async def upload_results_async(
+async def upload_results(
         config: AppConfig, logger: logging.Logger
         ) -> None:
     """
-    Orchestrates async upload of generated images via API
+    Orchestrate the async upload of generated images via the API.
     """
 
-    logger.info(f"Start uploading a final folder")
-    report = await upload_files_to_api_async(
+    logger.info("Start uploading a final folder")
+    report = await upload_files_to_api(
                         base_url=config.api.base_url,
                         username=config.api.username,
                         password=config.api.password,
@@ -44,7 +45,7 @@ async def upload_results_async(
         raise UploadIncompleteError(report.failed)
 
 
-async def upload_files_to_api_async(
+async def upload_files_to_api(
                         base_url: str,
                         username: str,
                         password: str,
@@ -53,11 +54,7 @@ async def upload_files_to_api_async(
                         max_concurrent: int = 10,
                         ) -> UploadReport:
     """
-    Recursively uploads all files from 'final/' tree to Clim4Cast API.
-
-    Example valid paths:
-        final/downloads/normal/CZ/AWP_0-40cm_0.png
-        final/layers/reduced/UTCI_3.png
+    Upload every file under the root folder to the Clim4Cast API.
     """
     if not os.path.isdir(root_folder):
         logger.error(f" Root folder does not exist: {root_folder}")
@@ -65,7 +62,7 @@ async def upload_files_to_api_async(
 
     root_folder = Path(root_folder)
 
-    all_files = list(root_folder.rglob("*.*")) 
+    all_files = list(root_folder.rglob("*.*"))
 
     auth = aiohttp.BasicAuth(username, password)
 
@@ -101,7 +98,7 @@ async def upload_files_to_api_async(
 
         uploaded, failed = [], []
 
-        for file_path, result in zip(all_files, results):
+        for file_path, result in zip(all_files, results, strict=True):
             if result is True:
                 uploaded.append(file_path)
             else:
@@ -123,7 +120,7 @@ async def upload_single_file(
         base_delay: float = 1.0,
 ) -> bool:
     """
-    Uploads a single file to the API
+    Upload one file to the API, retrying transient failures.
     """
     async with semaphore:
 

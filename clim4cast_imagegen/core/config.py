@@ -1,10 +1,9 @@
 import os
-import yaml
-from pathlib import Path
 from dataclasses import dataclass
-from dotenv import load_dotenv
-from typing import Dict, List
+from pathlib import Path
 
+import yaml
+from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(
     os.getenv("APP_ROOT", Path(__file__).resolve().parent.parent.parent)
@@ -79,17 +78,21 @@ class AppConfig:
     dry_run: bool = True
 
 
-def _require_keys(d: Dict, section_name: str, keys: List[str]) -> None:
+def _require_keys(
+        section_data: dict,
+        section_name: str,
+        keys: list[str]
+        ) -> None:
     """
     Validate that all required keys exist in a configuration section
     """
     missing_keys = []
 
-    if section_name not in d:
+    if section_name not in section_data:
         raise ValueError(f"Missing configuration section: \'{section_name}\'")
-    
+
     for key in keys:
-        if key not in d[section_name]:
+        if key not in section_data[section_name]:
             missing_keys.append(key)
 
     if missing_keys:
@@ -99,7 +102,7 @@ def _require_keys(d: Dict, section_name: str, keys: List[str]) -> None:
         )
 
 
-def _validate_structure(d: Dict) -> None:
+def _validate_structure(d: dict) -> None:
     """
     Validate the structure of the configuration dictionary.
     """
@@ -116,12 +119,12 @@ def _validate_structure(d: Dict) -> None:
         )
 
 
-def _build_app_config(cfg: Dict) -> AppConfig:
+def _build_app_config(cfg: dict) -> AppConfig:
     """
     Build an AppConfig instance from a validated configuration dictionary
     """
-    f_cfg = cfg["folders_paths"]
-    s_cfg = cfg["shapefiles_paths"]
+    folders_cfg = cfg["folders_paths"]
+    shapes_cfg = cfg["shapefiles_paths"]
 
     username = os.getenv("API_USERNAME")
     password = os.getenv("API_PASSWORD", "")
@@ -133,21 +136,23 @@ def _build_app_config(cfg: Dict) -> AppConfig:
 
     return AppConfig(
         folders=FolderPaths(
-            temp=PROJECT_ROOT / Path(f_cfg["temp_folder"]),
-            temp_crop=PROJECT_ROOT / Path(f_cfg["temp_folder_crop"]),
-            temp_trans=PROJECT_ROOT / Path(f_cfg["temp_folder_trans"]),
-            temp_rec=PROJECT_ROOT / Path(f_cfg["temp_folder_rec"]),
-            temp_img_v1=PROJECT_ROOT / Path(f_cfg["temp_folder_img_v1"]),
-            temp_img_v2=PROJECT_ROOT / Path(f_cfg["temp_folder_img_v2"]),
-            temp_final_v1=PROJECT_ROOT / Path(f_cfg["temp_final_img_v1"]),
-            temp_final_v2=PROJECT_ROOT / Path(f_cfg["temp_final_img_v2"]),
-            temp_downloads=PROJECT_ROOT / Path(f_cfg["temp_folder_final"]),
-            to_send=PROJECT_ROOT / Path(f_cfg["folder_to_send"])
+            temp=PROJECT_ROOT / Path(folders_cfg["temp_folder"]),
+            temp_crop=PROJECT_ROOT / Path(folders_cfg["temp_folder_crop"]),
+            temp_trans=PROJECT_ROOT / Path(folders_cfg["temp_folder_trans"]),
+            temp_rec=PROJECT_ROOT / Path(folders_cfg["temp_folder_rec"]),
+            temp_img_v1=PROJECT_ROOT / Path(folders_cfg["temp_folder_img_v1"]),
+            temp_img_v2=PROJECT_ROOT / Path(folders_cfg["temp_folder_img_v2"]),
+            temp_final_v1=PROJECT_ROOT / Path(folders_cfg["temp_final_img_v1"]),
+            temp_final_v2=PROJECT_ROOT / Path(folders_cfg["temp_final_img_v2"]),
+            temp_downloads=PROJECT_ROOT / Path(folders_cfg["temp_folder_final"]),
+            to_send=PROJECT_ROOT / Path(folders_cfg["folder_to_send"])
         ),
         shapes=ShapefilePaths(
-            countries=PROJECT_ROOT / Path(s_cfg["path_countries"]),
-            central_countries=PROJECT_ROOT / Path(s_cfg["path_central_countries"]),
-            sea=PROJECT_ROOT / Path(s_cfg["path_sea"])
+            countries=PROJECT_ROOT / Path(shapes_cfg["path_countries"]),
+            central_countries=(
+                PROJECT_ROOT / Path(shapes_cfg["path_central_countries"])
+                ),
+            sea=PROJECT_ROOT / Path(shapes_cfg["path_sea"])
         ),
         api=Clim4CastConfig(
             base_url=cfg["clim4cast"]["base_url"],
@@ -188,7 +193,7 @@ def load_app_config(config_path: Path = DEFAULT_CONFIG_PATH) -> AppConfig:
     """
     load_dotenv(PROJECT_ROOT / ".env")
 
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
         _validate_structure(cfg)
 

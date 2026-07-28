@@ -6,12 +6,11 @@ import pytest
 from clim4cast_imagegen.io.local_storage import (
     create_data_folder_path,
     ensure_dir,
-    grab_files,
     find_png_files_grouped_by_dir,
     is_already_processed,
-    mark_processed
-    )
-
+    iter_matching_files,
+    mark_processed,
+)
 
 PARAMETERS = ["AWD_0-40cm", "FWI_GenZ", "DFM1H", "HI", "UTCI"]
 
@@ -50,7 +49,7 @@ def test_grab_files(tmp_path):
     invalid_txt = tmp_path / "UTCI_2026-06-18.txt"
     invalid_txt.touch()
 
-    result = list(grab_files(tmp_path, parameters=PARAMETERS))
+    result = list(iter_matching_files (tmp_path, parameters=PARAMETERS))
 
     assert len(result) == 5
     assert invalid_tif not in result
@@ -60,7 +59,7 @@ def test_grab_files(tmp_path):
 
 
 def test_grab_files_empty(tmp_path):
-    result = list(grab_files(tmp_path, parameters=PARAMETERS))
+    result = list(iter_matching_files (tmp_path, parameters=PARAMETERS))
 
     assert result == []
 
@@ -71,7 +70,7 @@ def test_grab_files_finds_in_nested_subdirs(tmp_path):
     nested_tif = nested / "UTCI_2026-06-18.tif"
     nested_tif.touch()
 
-    result = list(grab_files(tmp_path, parameters=PARAMETERS))
+    result = list(iter_matching_files (tmp_path, parameters=PARAMETERS))
 
     assert nested_tif in result
 

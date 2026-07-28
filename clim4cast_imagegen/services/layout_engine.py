@@ -15,22 +15,7 @@ def combine_maps_with_layout(
                             logger: logging.Logger,
                             ) -> None:
     """
-    Combines map images with a background layout and adds labels.
-
-    This function places map images on a background layout, arranges them in a
-    grid, and adds labels below each map. It then saves the final composition to
-    a specified output file.
-
-    Args:
-        background_path (Path): The path to the background image.
-        maps_list (list[Path]): A list of paths to the map images to be added.
-        labels_list (list[str]): A list of labels corresponding to each map.
-        output_path (Path): The path where the final composition will be saved.
-        font_path (str, optional): The path to the font file used for labels.
-
-    Returns:
-        None: The function saves the final layout as a PNG file to the specified
-            output path.
+    Paste maps onto a background template and draw a date label under each.
     """
     background = open_rgba(background_path)
 
@@ -47,7 +32,9 @@ def combine_maps_with_layout(
     font = ImageFont.truetype(str(font_path), size=62)
 
     # Iterate through maps and place them on the background
-    for idx, (map_path, label) in enumerate(zip(maps_list, labels_list)):
+    for idx, (map_path, label) in enumerate(
+                            zip(maps_list, labels_list, strict=True)
+                            ):
         # Calculate position
         row = idx // 5  # Create a new row every 5 maps
         col = idx % 5   # Place maps in a horizontal line (max 5 in a row)
@@ -78,9 +65,9 @@ def combine_maps_with_layout(
     logger.debug(f"Layout saved to {output_path}")
 
 
-def process_image(src_path: Path, dst_path: Path, logger) -> None:
+def convert_to_rgb_png(src_path: Path, dst_path: Path, logger) -> None:
     """
-    Opens an image, convert it to RGB, and saves as PNG
+    Open an image, convert it to RGB, and save it as PNG.
     """
     try:
         with Image.open(src_path) as img:

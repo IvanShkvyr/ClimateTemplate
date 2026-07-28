@@ -1,14 +1,17 @@
+import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-import logging
 from multiprocessing import cpu_count
 from pathlib import Path
 
 from clim4cast_imagegen.core.config import AppConfig
+from clim4cast_imagegen.io.local_storage import (
+    ensure_dir,
+    find_png_files_grouped_by_dir,
+)
 from clim4cast_imagegen.services.layout_engine import combine_maps_with_layout
 from clim4cast_imagegen.utils.palette_utils import select_palette
 from clim4cast_imagegen.utils.pathname_utils import background_type_from_template
-from clim4cast_imagegen.io.local_storage import find_png_files_grouped_by_dir, ensure_dir
 
 
 def generate_templates(
@@ -17,7 +20,7 @@ def generate_templates(
         logger: logging.Logger,
         ) -> None:
     """
-    Paralel template generation.
+    Generate all composite templates in parallel.
     """
 
     templates = find_png_files_grouped_by_dir(
@@ -58,26 +61,25 @@ def generate_templates(
 
 def process_single_background(
         background: Path,
-        lauout_map,
+        layout_map,
         work_folder: Path,
         font_path: Path,
         ) -> None:
     """
-    Worker function executed in a separate process.
-    One background = one process
+    Build one composite image for a single background template.
     """
     logger = logging.getLogger("template_worker")
 
     background_type = background_type_from_template(background)
 
     try:
-        img_list = lauout_map[background_type]
+        img_list = layout_map[background_type]
     except KeyError:
         logger.warning(
             f"Background type {background_type} not found in layout."
             )
         return
-    
+
     date_labels = []
 
     # Extract date labels from image filenames
@@ -89,7 +91,7 @@ def process_single_background(
                                             ).strftime("%d.%m.%Y")
 
         date_labels.append(formatted_date)
-    
+
     if "DFM" in background_type:
         background_type = background_type.replace("DFM", "DFM_")
     if "AW" in background_type:
@@ -97,7 +99,6 @@ def process_single_background(
 
     # Define the output path for the composite image
     out_comp_file = work_folder / f"{background_type}.png"
-
 
     combine_maps_with_layout(
                             background,

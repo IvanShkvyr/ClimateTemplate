@@ -51,7 +51,7 @@ def test_reclassify_writes_to_output_dir_with_same_name(tmp_path):
 
 
 def test_reclassify_output_is_int16(tmp_path):
-    src = _make_raster(tmp_path / "input.tif", 
+    src = _make_raster(tmp_path / "input.tif",
                        np.array([[5.0, 15.0]], dtype="float32"))
     out_dir = tmp_path / "out"
     out_dir.mkdir()

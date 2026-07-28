@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 
-
 DEFAULT_LOG_LEVEL = "INFO"
 
 LOG_LEVELS = {
@@ -15,13 +14,7 @@ LOG_LEVELS = {
 
 def setup_logger(log_name: str = "image_generation") -> logging.Logger:
     """
-    Configurate and return a logger that logs message to a file and console.
-
-    Parameters:
-        log_name (str): log file name.
-
-    Return:
-        logging.Logger: Configured logger instance
+    Configure and return the application logger (stdout, optional file).
     """
     logger = logging.getLogger(log_name)
 
@@ -40,7 +33,7 @@ def setup_logger(log_name: str = "image_generation") -> logging.Logger:
         datefmt="%Y-%m-%d %H:%M:%S",
         )
 
-    #Console handler
+    # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(level)
     console_handler.setFormatter(formatter)
@@ -58,5 +51,3 @@ def setup_logger(log_name: str = "image_generation") -> logging.Logger:
     logger.propagate = False
 
     return logger
-
-

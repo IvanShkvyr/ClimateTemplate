@@ -4,14 +4,15 @@ import logging
 import aiohttp
 import pytest
 
+from clim4cast_imagegen.core.exceptions import UploadIncompleteError
 from clim4cast_imagegen.io import api
 from clim4cast_imagegen.io.api import (
+    UploadReport,
+    upload_files_to_api,
+    upload_results,
     upload_single_file,
-    upload_files_to_api_async,
-    upload_results_async,
-    UploadReport
-    )
-from clim4cast_imagegen.core.exceptions import UploadIncompleteError
+)
+
 
 class FakeResp:
     def __init__(self, outcome):
@@ -91,12 +92,12 @@ def test_upload_unexpected_error_no_retry(tmp_path):
     f.write_bytes(b"x")
     session = FakeSession([ValueError("boom")])
     assert asyncio.run(_run(session, f, tmp_path)) is False
-    assert session.calls == 1    
+    assert session.calls == 1
 
 
 def test_missing_root_folder_returns_empty_report(tmp_path):
     missing = tmp_path / "no_such_dir"
-    report = asyncio.run(upload_files_to_api_async(
+    report = asyncio.run(upload_files_to_api(
         base_url="http://x", username="u", password="p",
         root_folder=str(missing), logger=logging.getLogger("test"),
     ))
@@ -114,7 +115,7 @@ def test_report_counts_uploaded_and_failed(tmp_path, monkeypatch):
 
     monkeypatch.setattr(api, "upload_single_file", fake_upload)
 
-    report = asyncio.run(upload_files_to_api_async(
+    report = asyncio.run(upload_files_to_api(
         base_url="http://x", username="u", password="p",
         root_folder=str(tmp_path), logger=logging.getLogger("test"),
     ))
@@ -134,15 +135,15 @@ def _fake_config():
 def test_results_async_raises_when_some_failed(monkeypatch):
     async def fake_files(**kwargs):
         return UploadReport(uploaded=["a"], failed=["b"])
-    monkeypatch.setattr(api, "upload_files_to_api_async", fake_files)
+    monkeypatch.setattr(api, "upload_files_to_api", fake_files)
 
     with pytest.raises(UploadIncompleteError):
-        asyncio.run(upload_results_async(_fake_config(), logging.getLogger("test")))
+        asyncio.run(upload_results(_fake_config(), logging.getLogger("test")))
 
 
 def test_results_async_silent_when_all_uploaded(monkeypatch):
     async def fake_files(**kwargs):
         return UploadReport(uploaded=["a", "b"], failed=[])
-    monkeypatch.setattr(api, "upload_files_to_api_async", fake_files)
+    monkeypatch.setattr(api, "upload_files_to_api", fake_files)
 
-    asyncio.run(upload_results_async(_fake_config(), logging.getLogger("test")))
+    asyncio.run(upload_results(_fake_config(), logging.getLogger("test")))

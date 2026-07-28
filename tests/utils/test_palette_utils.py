@@ -4,7 +4,6 @@ import pytest
 
 from clim4cast_imagegen.utils.palette_utils import select_palette
 
-
 SELECT_PALETTE_EXAMPLES = [
     (
         Path("normal/cs"),

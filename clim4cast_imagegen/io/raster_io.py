@@ -1,30 +1,25 @@
 import logging
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
+import numpy as np
 import rasterio
+from pyproj import CRS
 from rasterio.features import shapes
 from rasterio.mask import mask
-import numpy as np
-from pyproj import CRS
-import rasterio
-from rasterio.warp import reproject, Resampling, calculate_default_transform
+from rasterio.warp import Resampling, calculate_default_transform, reproject
 
-def load_data_from_mask_raster(
+
+def load_mask_shapes(
         frame_to_raster: Path, logger: logging.Logger,
         ) -> list[Any]:
     """
-    Loads data from a raster file to create a mask based on the raster values.
-
-    Returns:
-        list: A list of geometries (shapes) representing the mask created from
-        the raster data.
+    Load mask shapes from a raster file.
     """
     if not frame_to_raster.exists():
         logger.error(f"Mask raster not found: {frame_to_raster}")
         raise FileNotFoundError(f"Missing mask file: {frame_to_raster}")
 
-    # Open the raster file using rasterio to read its data
     with rasterio.open(frame_to_raster) as src:
         # Read the first band (channel) of the raster file into a numpy array
         src_data = src.read(1)
@@ -50,10 +45,7 @@ def read_and_clip_raster(
         output_path: Path,
         ) -> None:
     """
-    Clips a raster using provided shapes and saves it with updated metadata.
-
-    Returns:
-        None: The function saves the clipped raster to the specified output path
+    Clip a raster with the given shapes and save it.
     """
     # Read the large raster file
     with rasterio.open(path_to_raster) as src:
@@ -87,23 +79,7 @@ def convert_coordinate_system_in_raster(
                                         input_path: Path,
                                         output_path: Path
                                         ) -> None:
-    """
-    Converts the coordinate system of the input raster to the specified CRS 
-    and saves the reprojected raster to the given output path.
-
-    Args:
-        crs_mercator (CRS): The target coordinate reference system (CRS) to
-            which the raster should be converted. Typically, this would be the
-            Web Mercator projection (EPSG:3857).
-        input_path (str): The file path of the input raster that needs to be
-            reprojected.
-        output_path (str): The file path where the reprojected raster will
-            be saved.
-
-    Returns:
-        None: The function performs the reprojecting and saves the resulting
-            raster to the specified output path.
-    """
+    """Reproject a raster to the given CRS and save it."""
     # Open the source raster to check its CRS and other properties
     with rasterio.open(input_path) as src:
 
@@ -122,7 +98,7 @@ def convert_coordinate_system_in_raster(
                             crs=target_crs, transform=transform,
                             width=width, height=height,
                             nodata=nodata_value) as dst:
-                
+
                 # Reproject the data from the source CRS to the target CRS
                 reproject(
                     source=rasterio.band(src, 1),
@@ -136,38 +112,20 @@ def convert_coordinate_system_in_raster(
 
 
 def reclassify_raster(
-                    raster_path: Path, 
-                    output_raster_path: Path, 
+                    raster_path: Path,
+                    output_raster_path: Path,
                     boundaries: list[float]
                     ) -> Path:
-    """
-    Reclassifies a raster based on specified boundaries and saves the output.
-
-    This function reads an input raster, reclassifies its pixel values into 
-    new classes based on the provided boundaries, and writes the reclassified
-    raster to the specified output path. The new raster will have integer class
-    values.
-
-    Args:
-        raster_path (Path): The path to the input raster file.
-        output_raster_path (Path): The directory where the output raster file
-            will be saved.
-        boundaries (List[float]): A list of boundary values to define the
-            reclassification bins.
-
-    Returns:
-        Path: The path to the saved reclassified raster file.
-    """
-    # Load the raster file
+    """Convert raster values into class indices and save them as int16."""
     with rasterio.open(raster_path) as src:
         raster_data = src.read(1)
         profile = src.profile
         # Default to -999 if NoData is not defined
         nodata_value = src.nodata if src.nodata is not None else -999.0
-    
+
     # Reclassify the raster data based on the provided boundaries
     classes = np.digitize(raster_data, bins=boundaries, right=True) - 1
-    
+
     final_path = Path(output_raster_path) / Path(raster_path).name
 
     # Update the profile with new data type and NoData value
@@ -182,7 +140,7 @@ def reclassify_raster(
 
 def read_raster_for_visualization(
         raster_path: Path
-        ) -> Tuple[np.ndarray, rasterio.Affine, float|None, int, int]:
+        ) -> tuple[np.ndarray, rasterio.Affine, float|None, int, int]:
     """
     Read raster data and metadata required for visualization.
     """

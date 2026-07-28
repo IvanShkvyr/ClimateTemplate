@@ -9,7 +9,7 @@ def open_rgba(path: Path) -> Image.Image:
 
 
 def save_image(image: Image, dst_path: Path, **kwargs) -> None:
-    """Save an image to file"""
+    """Save an image to file."""
     image.save(dst_path, **kwargs)
 
 

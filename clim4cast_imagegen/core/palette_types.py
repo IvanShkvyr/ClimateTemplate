@@ -1,21 +1,20 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Dict
 
 from clim4cast_imagegen.core.constants import PALETTES_V1, PALETTES_V2
 
 
 @dataclass(frozen=True)
 class RasterPalette:
-    colors: List[Tuple]
-    boundaries: List[float]
-    classes: List[int]
+    colors: list[tuple]
+    boundaries: list[float]
+    classes: list[int]
     continuous_coloring: bool
     reclassify: bool
 
 
 def _build_palette_registry(
-        raw_palettes: Dict, no_reclassify: set[str]
-    ) -> Dict[str, RasterPalette]:
+        raw_palettes: dict, no_reclassify: set[str]
+    ) -> dict[str, RasterPalette]:
     """
     Build a registry of RasterPalette objects from raw palette specs.
     """

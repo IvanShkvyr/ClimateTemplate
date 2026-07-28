@@ -1,27 +1,27 @@
 import asyncio
-from datetime import date
 import sys
+from datetime import date
 
 from clim4cast_imagegen.core.config import load_app_config
-from clim4cast_imagegen.core.logging_conf import setup_logger
-from clim4cast_imagegen.io.local_storage import (
-                                    find_input_data,
-                                    prepare_environment,
-                                    cleanup,
-                                    is_already_processed,
-                                    mark_processed
-                                    )
-from clim4cast_imagegen.io.api import upload_results_async
-from clim4cast_imagegen.services.raster_processor import generate_base_raster
-from clim4cast_imagegen.services.visualizer import generate_visualizations
-from clim4cast_imagegen.services.template_engine import generate_templates
-from clim4cast_imagegen.core.pipeline import run_step, run_step_async
 from clim4cast_imagegen.core.exceptions import Clim4CastError
+from clim4cast_imagegen.core.logging_conf import setup_logger
+from clim4cast_imagegen.core.pipeline import run_step, run_step_async
+from clim4cast_imagegen.io.api import upload_results
+from clim4cast_imagegen.io.local_storage import (
+    cleanup,
+    find_input_data,
+    is_already_processed,
+    mark_processed,
+    prepare_environment,
+)
+from clim4cast_imagegen.services.raster_processor import generate_base_raster
+from clim4cast_imagegen.services.template_engine import generate_templates
+from clim4cast_imagegen.services.visualizer import generate_visualizations
 
 
 async def main() -> None:
     """
-    Main asynchronous pipeline for processing and uploading data
+    Run one full pipeline pass: generate images and upload them.
     """
 
     logger = setup_logger()
@@ -45,22 +45,22 @@ async def main() -> None:
 
         prepare_environment(config, logger)
 
-        # 1. Creating basic
+        # 1. Creating basic rasters
         list_img = run_step(
             "generate_base_raster",
             lambda: generate_base_raster(path_to_data, config, logger),
             logger)
-        
-        # 2. Creating vizualization (PNG files)
+
+        # 2. Creating visualization (PNG files)
         visualizations = run_step(
-            "creating_vizualization",
+            "generate_visualizations",
             lambda: generate_visualizations(config, list_img, logger),
             logger,
             )
 
         # 3. Adding raster data to templates
         run_step(
-            "Adding_raster_data_to_templates",
+            "generate_templates",
             lambda: generate_templates(config, visualizations, logger),
             logger)
 
@@ -72,19 +72,19 @@ async def main() -> None:
             )
         else:
             await run_step_async(
-                "upload_results_async",
-                lambda: upload_results_async(config, logger),
+                "upload_results",
+                lambda: upload_results(config, logger),
                 logger,
             )
 
-        logger.info(f"Pipeline finished successfully.")
+        logger.info("Pipeline finished successfully.")
 
         # Mark done ONLY after a real delivery (dry-run doesn't upload)
         if not config.dry_run:
             mark_processed(today)
 
         cleanup(config, logger)
-        logger.info(f"Temporary directories cleaned up.")
+        logger.info("Temporary directories cleaned up.")
 
     except Clim4CastError as exc:
         logger.error(str(exc))
@@ -98,7 +98,7 @@ async def main() -> None:
         logger.info("Pipeline Execution Finished")
 
 def run() -> None:
-    """Synchronous entry point: runs the async pipeline once."""
+    """Run the pipeline once and exit with code 1 if it fails."""
     try:
         asyncio.run(main())
     except Exception:
