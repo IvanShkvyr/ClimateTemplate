@@ -43,4 +43,3 @@ font_path: "data/font/Roboto-Regular.ttf"
 # Base URL of the website/API where generated images are published
 clim4cast:
   base_url: "https://clim4cast.eu/api/"
-

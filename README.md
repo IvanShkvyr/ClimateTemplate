@@ -1,5 +1,5 @@
 # ClimateTemplate
-Project processes climate data by cropping raster files, placing them on a  
+Project processes climate data by cropping raster files, placing them on a
 template, and transferring them to an SFTP and FTP server for website integration.
 
 ## Requirements
@@ -10,7 +10,7 @@ Before using the script, please ensure that the following dependencies are insta
 - Libraries specified in the `requirements.txt` file
 - A folder containing the template files with the following directory structure (these folders are **not** included in the GitHub repository). It is crucial to maintain this folder hierarchy and naming conventions. Additionally, the raster templates must follow the naming convention with the following parameters: `bg_(parameter_name)_(depth, if applicable)`. Here are examples of template names used during script development:
 
-    - `bg_AWD_0-40cm`  # Available Water Depth 0-40 cm 
+    - `bg_AWD_0-40cm`  # Available Water Depth 0-40 cm
     - `bg_AWR_0-40cm`  # Available Water Reserve 0-40 cm
     - `bg_AWP_0-40cm`  # Available Water Potential 0-40 cm
     - `bg_AWD_0-100cm` # Available Water Depth 0-100 cm
@@ -32,8 +32,8 @@ The directory structure should look like this:
 ```
 / (root)
 │
-├── data/ 
-│      ├── raster_templates 
+├── data/
+│      ├── raster_templates
 │      │      └── background_templates
 │      │              ├── normal
 │      │              │      ├── cs

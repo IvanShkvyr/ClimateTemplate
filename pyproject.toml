@@ -28,7 +28,7 @@ include = ["clim4cast_imagegen*"]
 clim4cast-imagegen = "clim4cast_imagegen.cli:run"
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff", "mypy"]
+dev = ["pytest", "ruff", "mypy", "pre-commit"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -40,4 +40,3 @@ async def run_step_async(step_name: str, action, logger: logging.Logger):
     duration = time.monotonic() - start
     logger.info(f"Step finished: {step_name} ({duration:.1f}s)")
     return result
-
