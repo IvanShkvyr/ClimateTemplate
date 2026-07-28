@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -62,7 +62,7 @@ class ShapefilePaths:
 @dataclass
 class Clim4CastConfig:
     username: str
-    password: str
+    password: str = field(repr=False)
     base_url: str
 
 
@@ -127,12 +127,14 @@ def _build_app_config(cfg: dict) -> AppConfig:
     shapes_cfg = cfg["shapefiles_paths"]
 
     username = os.getenv("API_USERNAME")
-    password = os.getenv("API_PASSWORD", "")
+    password = os.getenv("API_PASSWORD")
     raw = os.getenv("CLIM4CAST_DRY_RUN", "true").strip().lower()
     dry_run = raw not in ("false", "0", "no")
 
     if not username:
         raise ValueError("Critical error: API_USERNAME not found in .env file!")
+    if not password:
+        raise ValueError("Critical error: API_PASSWORD not found in .env file!")
 
     return AppConfig(
         folders=FolderPaths(
