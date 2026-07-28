@@ -13,9 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import (
     BoundaryNorm,
-    LinearSegmentedColormap,
     ListedColormap,
-    Normalize,
 )
 from rasterio.plot import show
 from tqdm import tqdm
@@ -47,7 +45,6 @@ def create_map_visualization(
                                 countries_shapefile: gpd.GeoDataFrame,
                                 central_countries_shapefile: gpd.GeoDataFrame,
                                 sea_shapefile: gpd.GeoDataFrame,
-                                continuous: bool = True
                                 ) -> None:
     """Render a raster as a PNG map with country and sea layers on top."""
     raster_data, transform, nodata_value, width, height = (
@@ -67,33 +64,10 @@ def create_map_visualization(
         tuple(c / 255.0 for c in color) for color in colors
         ]
 
-    if continuous:
-        # Create a mask for NoData values
-        no_data_mask = np.logical_or(raster_data == -999, raster_data == -1)
-
-        # Calculate color positions based on boundaries
-        min_val = boundaries[1]  # First valid boundary after NoData
-        max_val = boundaries[-1]
-        positions = [
-            (boundary - min_val) / (max_val - min_val)
-            for boundary in boundaries[1:]
-            ]
-        positions = [0] + positions  # Add 0 for the first color
-
-        # Create a color map
-        cmap = LinearSegmentedColormap.from_list("custom_cmap",
-                    list(zip(positions, normalized_colors[1:], strict=True)))
-
-        # Create a normalizer for the value range
-        norm = Normalize(vmin=min_val, vmax=max_val)
-
-        # Apply mask for NoData values
-        masked_data = np.ma.masked_where(no_data_mask, raster_data)
-
-    else:
-        # For discrete classes, use the original approach
-        cmap = ListedColormap(normalized_colors)
-        norm = BoundaryNorm(boundaries, cmap.N, extend='max')
+    
+    # For discrete classes, use the original approach
+    cmap = ListedColormap(normalized_colors)
+    norm = BoundaryNorm(boundaries, cmap.N, extend='max')
 
     # Create a figure for the visualization
     fig, ax = plt.subplots(figsize=(21, 21), dpi=DPI)
@@ -254,7 +228,6 @@ def process_single_raster(
     boundaries = palette.boundaries
     colors = palette.colors
     classes = palette.classes
-    continuous = palette.continuous_coloring
 
     if palette.reclassify:
         raster_path = reclassify_raster(raster_path, work_folder, boundaries)
@@ -270,7 +243,7 @@ def process_single_raster(
                                 countries_shapefile,
                                 central_countries_shapefile,
                                 sea_shapefile,
-                                continuous)
+                                )
 
     background_type = background_type_from_raster(raster_name_parts)
 

@@ -30,7 +30,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [0, 1, 2, 3, 4, 5, 6],  # Corresponding to Slightly, Minor, Moderate, Severe, Exceptional, Extreme
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6],  # Class values corresponding to different ranges
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "AWD": {
         "colors": [
@@ -45,7 +44,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-200, -60, -30, 0, 30, 60, 200],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for AWD data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "AWR": {
         "colors": [
@@ -60,7 +58,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [0, 10, 30, 50, 70, 90, 100],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for AWR data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "HI": {
         "colors": [
@@ -74,7 +71,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-float("inf"), 27, 32, 41, 54, 100],  # Temperature ranges in °C
         "classes": [-999, -1, 0, 1, 2, 3, 4], # Class values for HI data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "UTCI": {
         "colors": [
@@ -93,7 +89,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-100, -40, -27, -13, 0, 9, 26, 32, 38, 46, 100],  # Corresponding ranges
         "classes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], # Class values for UTCI data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "FWI": {
         "colors": [
@@ -108,7 +103,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [1, 2, 3, 4, 5, 6],  # Categories from Very Low to Extreme
         "classes": [-999, -1, 1, 2, 3, 4, 5, 6], # Class values for FWI data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "DFM1H": {
         "colors": [
@@ -123,7 +117,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
         "DFM10H": {
         "colors": [
@@ -138,7 +131,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
         "DFM100H": {
         "colors": [
@@ -153,7 +145,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
         "DFM1000H": {
         "colors": [
@@ -168,7 +159,6 @@ PALETTES_V2 = {
         ],
         "boundaries": [-0.9, 6, 9, 12, 15, 25, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
 }
 
@@ -188,7 +178,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [0, 1, 2, 3, 4, 5, 6],  # Corresponding to Slightly, Minor, Moderate, Severe, Exceptional, Extreme
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6],  # Class values corresponding to different ranges
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "AWD": {
         "colors": [
@@ -397,7 +386,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-200, -99, -98, -97, -96, -95, -94, -93, -92, -91, -90, -89, -88, -87, -86, -85, -84, -83, -82, -81, -80, -79, -78, -77, -76, -75, -74, -73, -72, -71, -70, -69, -68, -67, -66, -65, -64, -63, -62, -61, -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40, -39, -38, -37, -36, -35, -34, -33, -32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 200],  # Corresponding ranges
         "classes": [-999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199],  # Class values for AWD data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "AWR": {
         "colors": [
@@ -507,7 +495,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100],  # Class values for AWR data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "HI": {
         "colors": [
@@ -577,7 +564,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-float("inf"), 0, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76, 78, 81, 84, 87, 90, 93, 96, 100],  # Temperature ranges in °C
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60], # Sequential class indices produced by reclassify_raster (np.digitize), used as BoundaryNorm bins
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "UTCI": {
         "colors": [
@@ -785,7 +771,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-200, -99, -98, -97, -96, -95, -94, -93, -92, -91, -90, -89, -88, -87, -86, -85, -84, -83, -82, -81, -80, -79, -78, -77, -76, -75, -74, -73, -72, -71, -70, -69, -68, -67, -66, -65, -64, -63, -62, -61, -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40, -39, -38, -37, -36, -35, -34, -33, -32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 200],  # Corresponding ranges
         "classes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199],  # Class values for AWD data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "FWI": {
         "colors": [
@@ -800,7 +785,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [1, 2, 3, 4, 5, 6],  # Categories from Very Low to Extreme
         "classes": [-999, -1, 1, 2, 3, 4, 5, 6], # Class values for FWI data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "DFM1H": {
         "colors": [
@@ -845,7 +829,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "DFM10H": {
         "colors": [
@@ -890,7 +873,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "DFM100H": {
         "colors": [
@@ -935,7 +917,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
     "DFM1000H": {
         "colors": [
@@ -980,7 +961,6 @@ PALETTES_V1 = {
         ],
         "boundaries": [-0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Corresponding ranges
         "classes": [-999, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],  # Class values for DFM10H data
-        "continuous_coloring": False, # Enables continuous color gradient
     },
 }
 
