@@ -9,7 +9,7 @@ description = "Pipeline that generates climate map images for the website"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "aiohttp",
+    "aiohttp>=3.9,<4",
     "geopandas",
     "matplotlib",
     "numpy",
@@ -18,7 +18,6 @@ dependencies = [
     "python-dotenv",
     "pyyaml",
     "rasterio",
-    "requests",
     "tqdm",
 ]
 
@@ -29,7 +28,14 @@ include = ["clim4cast_imagegen*"]
 clim4cast-imagegen = "clim4cast_imagegen.cli:run"
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "ruff", "mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
