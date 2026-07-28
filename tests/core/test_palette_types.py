@@ -7,13 +7,11 @@ FAKE_RAW_PALETTES = {
         "colors": [(255, 0, 0)],
         "boundaries": [0.0, 1.0],
         "classes": [1],
-        "continuous_coloring": False,
     },
     "AWD": {
         "colors": [(0, 255, 0)],
         "boundaries": [0.0, 2.0],
         "classes": [1, 2],
-        "continuous_coloring": True,
     },
 }
 
@@ -21,22 +19,14 @@ INVALID_RAW_PALETTES = [
     ({"AWP": {
         "boundaries": [0.0, 1.0],
         "classes": [1],
-        "continuous_coloring": False,
     },}),
     ({"AWP": {
         "colors": [(0, 255, 0)],
         "classes": [1, 2],
-        "continuous_coloring": True,
     },}),
     ({"AWP": {
         "colors": [(255, 0, 0)],
         "boundaries": [0.0, 1.0],
-        "continuous_coloring": False,
-    },}),
-    ({"AWP": {
-        "colors": [(0, 255, 0)],
-        "boundaries": [0.0, 2.0],
-        "classes": [1, 2],
     },}),
 ]
 
@@ -49,7 +39,6 @@ def test_build_palette_registry_fields():
     assert palette.colors == [(0, 255, 0)]
     assert palette.boundaries == [0.0, 2.0]
     assert palette.classes == [1, 2]
-    assert palette.continuous_coloring is True
 
 
 @pytest.mark.parametrize("raster_type, no_reclassify, expected",[

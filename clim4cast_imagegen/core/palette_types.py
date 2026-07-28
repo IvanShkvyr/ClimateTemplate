@@ -8,7 +8,6 @@ class RasterPalette:
     colors: list[tuple]
     boundaries: list[float]
     classes: list[int]
-    continuous_coloring: bool
     reclassify: bool
 
 
@@ -23,7 +22,6 @@ def _build_palette_registry(
             colors=spec["colors"],
             boundaries=spec["boundaries"],
             classes=spec["classes"],
-            continuous_coloring=spec["continuous_coloring"],
             reclassify=raster_type not in no_reclassify,
         )
         for raster_type, spec in raw_palettes.items()
