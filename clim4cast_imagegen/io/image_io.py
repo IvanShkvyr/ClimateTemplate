@@ -8,7 +8,7 @@ def open_rgba(path: Path) -> Image.Image:
     return Image.open(path).convert("RGBA")
 
 
-def save_image(image: Image, dst_path: Path, **kwargs) -> None:
+def save_image(image: Image.Image, dst_path: Path, **kwargs) -> None:
     """Save an image to file."""
     image.save(dst_path, **kwargs)
 
